@@ -1,0 +1,26 @@
+# This configuration file is supposed to be run in local mode.
+# Tested on an image containing gluon-ts v0.6.4
+
+SimpleFeedForward:
+    image: gluonts_cpu:v0.6.4
+    instance: local
+    hyperparameters:
+        forecaster_name: gluonts.model.simple_feedforward.SimpleFeedForwardEstimator    
+        freq: 
+            $eval: $trial.dataset.meta.freq
+        prediction_length:
+            $eval: 2 * $trial.dataset.meta.prediction_length
+
+electricity_dataset:
+    meta:
+        freq: H
+        prediction_length: 24
+    path:
+        # Local copy of a Gluon-TS dataset
+        train: file:///Users/freccero/.mxnet/gluon-ts/datasets/electricity/train/data.json
+        test: file:///Users/freccero/.mxnet/gluon-ts/datasets/electricity/test/data.json
+
+datasets:
+    - $ref: electricity_dataset
+algorithms:
+    - $ref: SimpleFeedForward
