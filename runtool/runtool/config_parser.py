@@ -70,8 +70,20 @@ def recursive_apply_dict(node: dict, fn):
 
 @recursive_apply.register
 def recursive_apply_list(node: list, fn):
-    child_versions = []
-    child_normal = [None] * len(node)
+    """
+    Applies the passed function `fn` to each element in the list.
+    Merges any Versions objects present in the children.
+
+    Given:
+
+    node = [1, Versions([2, 3]), 4, Versions([5, 6])]
+    fn = lambda x: x
+
+    this returns:
+    Versions([[1,2,4,5], [1,2,4,6], [1,3,4,5], [1,3,4,6]])
+    """
+    versions_in_children = []
+    child_normal = [None] * len(node)  # maintans indexes
     for index in range(len(node)):
         child = recursive_apply(node[index], fn)
         if isinstance(child, Versions):
@@ -79,24 +91,18 @@ def recursive_apply_list(node: list, fn):
             # =>
             # expanded_child_version = ((index, 1), (index, 2))
             expanded_child_version = itertools.product([index], child.versions)
-            child_versions.append(expanded_child_version)
+            versions_in_children.append(expanded_child_version)
         else:
             child_normal[index] = child
 
-    if len(child_versions) == 0:
+    if not versions_in_children:
         return child_normal
-    # for node with two Version elements Version([1,2]) on index 1
-    # and Version([3,4]) on index 3
-    # merged_versions = [
-    #   ((1,1), (3,4)),
-    #   ...
-    #   ((1,2), (3,5))
-    # ]
-    merged_versions = itertools.product(*child_versions)
 
+    # merge the data from the children which were not Versions objects
+    # together with the data from the children which were Versions objects
     new_versions = []
-    for version in merged_versions:
-        new_data = child_normal[:]  # copy list
+    for version in itertools.product(*versions_in_children):
+        new_data = child_normal[:]
         for index, value in version:
             new_data[index] = value
         new_versions.append(new_data)
