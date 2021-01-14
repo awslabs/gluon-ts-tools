@@ -1,9 +1,9 @@
-class Versions:
-    versions = None
+from pydantic import BaseModel
+from typing import Any, List
 
-    def __init__(self, versions_to_add):
-        assert isinstance(versions_to_add, list)
-        self.versions = versions_to_add
+
+class Versions(BaseModel):
+    versions: List
 
     def flatten(self):
         if isinstance(self.versions[0], ListNode):
@@ -44,7 +44,7 @@ class Versions:
             ),
         )
         new = multiplied.pop()
-        while len(multiplied) > 0:
+        while multiplied:
             new = new + multiplied.pop()
 
         return new
@@ -198,7 +198,7 @@ class Dataset(Node):
     @classmethod
     def verify(cls, data):
         try:
-            assert len(data["path"]) > 0
+            assert data["path"]
             assert isinstance(data["path"], dict)
             if "meta" in data:
                 assert isinstance(data["meta"], dict)

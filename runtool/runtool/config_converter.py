@@ -21,7 +21,7 @@ def infer_type(node: Any) -> Any:
 
 @infer_type.register
 def infer_type_list(node: list) -> Union[Algorithms, Datasets, Generics, Any]:
-    if len(node) == 0:
+    if not node:
         return Generics(node)
     elif Algorithms.verify(node):
         return Algorithms(node)
@@ -68,4 +68,4 @@ def convert_to_types_dict(data: dict) -> Dict:
 
 @convert_to_types.register
 def convert_to_types_versions(data: Versions) -> Versions:
-    return Versions([infer_type(item) for item in data.versions])
+    return Versions(versions=[infer_type(item) for item in data.versions])

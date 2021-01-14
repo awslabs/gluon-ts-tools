@@ -2,13 +2,10 @@ import click
 import pandas as pd
 import yaml
 from beautifultable import BeautifulTable
+from runtool.utils import get_item_from_path
 
 
 def generate_dry_run_table(sagemaker_json: dict, print_table: bool):
-    def get(data, path):
-        for key in path.split("."):
-            data = data[key]
-        return data
 
     table_data_paths = {
         "image": "AlgorithmSpecification.TrainingImage",
@@ -22,14 +19,14 @@ def generate_dry_run_table(sagemaker_json: dict, print_table: bool):
     for job_definition in sagemaker_json:
         row = {}
         for key, path in table_data_paths.items():
-            row[key] = get(job_definition, path)
+            row[key] = get_item_from_path(job_definition, path)
 
         row["tags"] = {
             tag["Key"]: tag["Value"] for tag in job_definition["Tags"]
         }
         row["run"] = row["tags"]["run_number"]
         row["datasets"] = [
-            get(channel, "DataSource.S3DataSource.S3Uri")
+            get_item_from_path(channel, "DataSource.S3DataSource.S3Uri")
             for channel in job_definition["InputDataConfig"]
         ]
 

@@ -1,6 +1,16 @@
 from collections.abc import Mapping
 
 from runtool.datatypes import Versions
+from typing import Union, Any
+
+
+def get_item_from_path(data: Union[dict, list], path: str) -> Any:
+    """
+    Access dict or list using a path split by '.'
+    """
+    for key in path.split("."):
+        data = data[key]
+    return data
 
 
 def recurse_print(data, indent=0, step_size=3):

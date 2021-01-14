@@ -24,7 +24,6 @@ class JobsDispatcher:
         sys.stdout.write("\r")
 
     def write_response(self, run, response):
-
         with open(self.cache_path + "/jobs.json", "a") as f:
             f.write("{")
             f.write(
@@ -56,7 +55,7 @@ class JobsDispatcher:
                 # 1. run as many jobs as possible for the given queue
                 has_resources = True
                 while has_resources:
-                    if len(queue) == 0:
+                    if not queue:
                         break
                     run = queue.pop()
                     jobs_done = all_jobs - jobs_to_run

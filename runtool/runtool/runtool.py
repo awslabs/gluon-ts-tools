@@ -7,7 +7,16 @@ from functools import partial, singledispatch
 from itertools import chain
 
 from runtool import config_converter, config_parser, paths
-from runtool.datatypes import *
+from runtool.datatypes import (
+    Algorithms,
+    Algorithm,
+    Datasets,
+    Dataset,
+    Versions,
+    DotDict,
+    Experiments,
+    Experiment,
+)
 from runtool.dispatcher import JobsDispatcher
 from runtool.dryrun import generate_dry_run_table
 from runtool.local_runner import run_training_on_local_machine
@@ -24,9 +33,9 @@ def hash(data):
 def set_dict_from_path(dictionary, path, value):
     path = path.split(".")
     current = dictionary
-    while len(path) > 0:
+    while path:
         key = path.pop(0)
-        if len(path) == 0:
+        if not path:
             current[key] = value
         elif key in current:
             current = current[key]
@@ -46,11 +55,9 @@ class Config(DotDict):
                 else:
                     if not type(base[key]) is Versions:
                         if base[key] != value:
-                            base[key] = Versions([base[key], value])
+                            base[key] = Versions(versions=[base[key], value])
                     elif not value in base[key].versions:
                         base[key].versions.append(value)
-                    else:
-                        pass  # the same value is already added to the versions
 
         self.update(DotDict(base))
 
@@ -91,10 +98,8 @@ class Client:
 
         if not tags:
             tags = {}
-        if "tags" in trial["algorithm"]:
-            tags.update(trial["algorithm"]["tags"])
-        if "tags" in trial["dataset"]:
-            tags.update(trial["dataset"]["tags"])
+        tags.update(trial["algorithm"].get("tags", {}))
+        tags.update(trial["dataset"].get("tags", {}))
         tags.update(
             {
                 "run_configuration_id": run_configuration,  # identifies dataset/algorithm used
@@ -105,28 +110,17 @@ class Client:
                 ),
             }
         )
-        tags = [
-            {"Key": key, "Value": str(value)} for key, value in tags.items()
+        tags = [{"Key": key, "Value": str(tags[key])} for key in tags]
+
+        metrics = [
+            {"Name": key, "Regex": value}
+            for key, value in {
+                **trial["algorithm"].get("metrics", {}),
+                **trial["dataset"].get("metrics", {}),
+            }.items()
         ]
 
-        metrics = []
-        if "metrics" in trial["algorithm"]:
-            metrics += [
-                {"Name": key, "Regex": value}
-                for key, value in trial["algorithm"]["metrics"].items()
-            ]
-
-        if "metrics" in trial["dataset"]:
-            metrics += [
-                {"Name": key, "Regex": value}
-                for key, value in trial["dataset"]["metrics"].items()
-            ]
-
-        hyperparameters = (
-            trial["algorithm"]["hyperparameters"]
-            if "hyperparameters" in trial["algorithm"]
-            else {}
-        )
+        hyperparameters = trial["algorithm"].get("hyperparameters", {})
 
         # extract path and value to override
         override_paths = {}
@@ -293,7 +287,6 @@ class Client:
                     tags,
                 )
             ),
-            indent=3,
         )
 
 
