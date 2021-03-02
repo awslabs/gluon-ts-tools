@@ -1,0 +1,144 @@
+# This configuration file defines 6 algorithms and 5 datasets
+# It is compatible with images containing gluon-ts v0.5.0+
+
+job_name: 
+  $eval: f"{$trial.algorithm.hyperparameters.forecaster_name.split('.')[-1]}--{uid}"
+
+# Below comes the algorithms used in the experiment
+base_algorithm: 
+  $job_name: 
+    $ref: job_name
+  hyperparameters:
+    prediction_length:
+      $eval: $trial.dataset.meta.prediction_length
+    freq:
+      $eval: $trial.dataset.meta.freq
+    epochs: 300
+    num_batches_per_epoch: 100
+    batch_size: 64
+  instance: ml.m5.xlarge
+  image: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+  metrics:
+    Coverage[0.1]: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    Coverage[0.5]: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    Coverage[0.9]: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    MAE_Coverage: 'MAE_Coverage\): (\d+\.\d+)'
+    MAPE: 'MAPE\): (\d+\.\d+)'
+    MASE: 'MASE\): (\d+\.\d+)'
+    MSE: 'MSE\): (\d+\.\d+)'
+    MSIS: 'MSIS\): (\d+\.\d+)'
+    ND: 'ND\): (\d+\.\d+)'
+    NRMSE: 'NRMSE\): (\d+\.\d+)'
+    OWA: 'OWA\): (\d+\.\d+)'
+    QuantileLoss[0.1]: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    QuantileLoss[0.5]: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    QuantileLoss[0.9]: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    RMSE: 'RMSE\): (\d+\.\d+)'
+    abs_error: 'abs_error\): (\d+\.\d+)'
+    abs_target_mean: 'abs_target_mean\): (\d+\.\d+)'
+    abs_target_sum: 'abs_target_sum\): (\d+\.\d+)'
+    mean_wQuantileLoss: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    sMAPE: 'sMAPE\): (\d+\.\d+)'
+    seasonal_error: 'seasonal_error\): (\d+\.\d+)'
+    wQuantileLoss[0.1]: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    wQuantileLoss[0.5]: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    wQuantileLoss[0.9]: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+
+simplefeedforward:
+  $from: base_algorithm
+  hyperparameters:
+    forecaster_name: gluonts.model.simple_feedforward.SimpleFeedForwardEstimator
+
+mqcnn:
+  $from: base_algorithm
+  hyperparameters:
+    forecaster_name: gluonts.model.seq2seq.MQCNNEstimator
+    hybridize: False
+
+mqrnn:
+  $from: base_algorithm
+  instance: ml.p3.2xlarge
+  hyperparameters:
+    forecaster_name: gluonts.model.seq2seq.MQRNNEstimator
+
+deepAR:
+  $from: base_algorithm
+  instance: ml.p3.2xlarge  
+  hyperparameters:
+    forecaster_name: gluonts.model.deepar.DeepAREstimator
+
+transformer:
+  $from: base_algorithm
+  hyperparameters:
+    forecaster_name: gluonts.model.transformer.TransformerEstimator
+
+ets:
+  $job_name: 
+    $ref: job_name
+  hyperparameters:
+    prediction_length:
+      $eval: $trial.dataset.meta.prediction_length
+    freq:
+      $eval: $trial.dataset.meta.freq
+    forecaster_name: gluonts.model.r_forecast.RForecastPredictor
+    method: ets
+  instance: ml.m4.4xlarge
+  image: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+
+
+# below comes some datasets
+traffic:
+  meta: 
+    freq: D
+    prediction_length: 7
+  path:
+    train: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+    test: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+
+electricity:
+  meta: 
+    freq: D
+    prediction_length: 14
+  path:
+    train: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+    test: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+
+exchange_rate:
+  meta: 
+    freq: D
+    prediction_length: 21
+  path:
+    train: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+    test: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+
+solar_energy:
+  meta: 
+    freq: D
+    prediction_length: 28
+  path:
+    train: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+    test: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+
+m4_hourly:
+  meta: 
+    freq: D
+    prediction_length: 7
+  path:
+    train: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+    test: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+
+# structure for storing them together
+datasets:
+  - $ref: traffic
+  - $ref: electricity
+  - $ref: exchange_rate
+  - $ref: solar_energy
+  - $ref: m4_hourly
+
+algorithms:
+  - $ref: simplefeedforward
+  - $ref: mqcnn
+  - $ref: mqrnn 
+  - $ref: deepAR 
+  - $ref: transformer
+  - $ref: ets

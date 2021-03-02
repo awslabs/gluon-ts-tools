@@ -1,0 +1,16 @@
+my_ds:
+  path:
+    train: s3://runtool/datasets/constant/train/data.json
+    test: s3://runtool/datasets/constant/test/data.json
+
+my_algo:
+  image: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts/cpu:latest # image with gluon-ts installed
+  instance: ml.m5.xlarge
+  hyperparameters:
+    prediction_length: 7
+    freq: D
+
+algorithms:
+  - $ref: my_algo
+datasets:
+  - $ref: my_ds
