@@ -7,6 +7,6 @@ setup(
     packages=find_packages("./runtool"),
     description="Gluonts run tool package",
     include_package_data=True,
-    install_requires=["PyYAML", "pydantic"],
+    install_requires=["PyYAML", "pydantic", "toolz"],
     entry_points={},
 )

@@ -13,11 +13,12 @@ class Versions:
     Versions([1, 2, 3])
     """
 
-    def __init__(self, versions: list):
-        assert isinstance(versions, list)
-        self.__root__ = versions
+    def __init__(self, versions: list = None):
+        self.__root__ = versions if versions else []
 
     def __repr__(self):
+        if len(self) == 1:
+            return repr(self[0])
         return f"Versions({self.__root__})"
 
     def __getitem__(self, item):
@@ -30,18 +31,12 @@ class Versions:
         return iter(self.__root__)
 
     def __eq__(self, other):
-        if not isinstance(other, Versions):
-            return False
+        if isinstance(other, Versions):
+            return self.__root__ == other.__root__
+        return False
 
-        if len(other) != len(self):
-            return False
-
-        # enforce same ordering and equality of children
-        for this_version, other_version in zip(self.__root__, other.__root__):
-            if this_version != other_version:
-                return False
-
-        return True
+    def append(self, data: Any):
+        self.__root__.append(data)
 
 
 @singledispatch
@@ -107,7 +102,7 @@ def recursive_apply(node, fn: Callable) -> Any:
     ...     fn=transform
     ... )
     >>> type(result)
-    <class 'recurse_config.Versions'>
+    <class 'runtool.recurse_config.Versions'>
     >>> for version in result:
     ...     print(version)
     {'my_list': [{'hello': 'there'}, {'a': 1}, {'b': 3}]}

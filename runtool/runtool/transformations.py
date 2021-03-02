@@ -333,16 +333,16 @@ def apply_each(node: dict) -> Versions:
     If dictionaries are passed to $each, these will be updated with the
     value of the passed `node` before a Versions object is generated.
 
-    >>> apply_each({"a": 1, "$each": [{"b": 2}]})
-    Versions([{'b': 2, 'a': 1}])
+    >>> apply_each({"a": 1, "$each": [{"b": 2}, {"b": 3}]})
+    Versions([{'b': 2, 'a': 1}, {'b': 3, 'a': 1}])
 
     It is possible to have an unaltered version of the parent node by
     inserting $None into the values of $each. In the example below,
     apply_each generates two versions of the node, one which is unaltered
     and one which is merged with another dict.
 
-    >>> apply_each({"a": 1, "$each": ["$None"]})
-    Versions([{'a': 1}])
+    >>> apply_each({"a": 1, "$each": ["$None", {"b": 2}]})
+    Versions([{'a': 1}, {'b': 2, 'a': 1}])
 
     Below is a more complicated example combining the two examples above:
 
