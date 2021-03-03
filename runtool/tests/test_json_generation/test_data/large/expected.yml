@@ -1,0 +1,2547 @@
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.simple_feedforward.SimpleFeedForwardEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_c1830c42
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_c1830c42
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.simple_feedforward.SimpleFeedForwardEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '14'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_a7da92c2
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_a7da92c2
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.simple_feedforward.SimpleFeedForwardEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '21'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_996ba6a1
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_996ba6a1
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.simple_feedforward.SimpleFeedForwardEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '28'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_d64cb6c1
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_d64cb6c1
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.simple_feedforward.SimpleFeedForwardEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_c1830c42
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_c1830c42
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.seq2seq.MQCNNEstimator
+    freq: D
+    hybridize: 'False'
+    num_batches_per_epoch: '100'
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_c73cd974
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_c73cd974
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.seq2seq.MQCNNEstimator
+    freq: D
+    hybridize: 'False'
+    num_batches_per_epoch: '100'
+    prediction_length: '14'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_81a8a17a
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_81a8a17a
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.seq2seq.MQCNNEstimator
+    freq: D
+    hybridize: 'False'
+    num_batches_per_epoch: '100'
+    prediction_length: '21'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_7e29cf9f
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_7e29cf9f
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.seq2seq.MQCNNEstimator
+    freq: D
+    hybridize: 'False'
+    num_batches_per_epoch: '100'
+    prediction_length: '28'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_98e51ee5
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_98e51ee5
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.seq2seq.MQCNNEstimator
+    freq: D
+    hybridize: 'False'
+    num_batches_per_epoch: '100'
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_c73cd974
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_c73cd974
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.seq2seq.MQRNNEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_4a28156f
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.p3.2xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_4a28156f
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.seq2seq.MQRNNEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '14'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_af89b9b1
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.p3.2xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_af89b9b1
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.seq2seq.MQRNNEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '21'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_e68be314
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.p3.2xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_e68be314
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.seq2seq.MQRNNEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '28'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_c04e19fe
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.p3.2xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_c04e19fe
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.seq2seq.MQRNNEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_4a28156f
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.p3.2xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_4a28156f
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.deepar.DeepAREstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_6fd174ff
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.p3.2xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_6fd174ff
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.deepar.DeepAREstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '14'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_c2c2fd1a
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.p3.2xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_c2c2fd1a
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.deepar.DeepAREstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '21'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_e2afe787
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.p3.2xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_e2afe787
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.deepar.DeepAREstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '28'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_8f3af3b4
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.p3.2xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_8f3af3b4
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.deepar.DeepAREstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_6fd174ff
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.p3.2xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_6fd174ff
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.transformer.TransformerEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_015707be
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_015707be
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.transformer.TransformerEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '14'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_80ae89f7
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_80ae89f7
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.transformer.TransformerEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '21'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_e76c3c4d
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_e76c3c4d
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.transformer.TransformerEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '28'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_8d5a64e0
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_8d5a64e0
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions:
+    - Name: Coverage[0.1]
+      Regex: 'Coverage\[0\.1\]\): (\d+\.\d+)'
+    - Name: Coverage[0.5]
+      Regex: 'Coverage\[0\.5\]\): (\d+\.\d+)'
+    - Name: Coverage[0.9]
+      Regex: 'Coverage\[0\.9\]\): (\d+\.\d+)'
+    - Name: MAE_Coverage
+      Regex: 'MAE_Coverage\): (\d+\.\d+)'
+    - Name: MAPE
+      Regex: 'MAPE\): (\d+\.\d+)'
+    - Name: MASE
+      Regex: 'MASE\): (\d+\.\d+)'
+    - Name: MSE
+      Regex: 'MSE\): (\d+\.\d+)'
+    - Name: MSIS
+      Regex: 'MSIS\): (\d+\.\d+)'
+    - Name: ND
+      Regex: 'ND\): (\d+\.\d+)'
+    - Name: NRMSE
+      Regex: 'NRMSE\): (\d+\.\d+)'
+    - Name: OWA
+      Regex: 'OWA\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.1]
+      Regex: 'QuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.5]
+      Regex: 'QuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: QuantileLoss[0.9]
+      Regex: 'QuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    - Name: RMSE
+      Regex: 'RMSE\): (\d+\.\d+)'
+    - Name: abs_error
+      Regex: 'abs_error\): (\d+\.\d+)'
+    - Name: abs_target_mean
+      Regex: 'abs_target_mean\): (\d+\.\d+)'
+    - Name: abs_target_sum
+      Regex: 'abs_target_sum\): (\d+\.\d+)'
+    - Name: mean_wQuantileLoss
+      Regex: 'mean_wQuantileLoss\): (\d+\.\d+)'
+    - Name: sMAPE
+      Regex: 'sMAPE\): (\d+\.\d+)'
+    - Name: seasonal_error
+      Regex: 'seasonal_error\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.1]
+      Regex: 'wQuantileLoss\[0\.1\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.5]
+      Regex: 'wQuantileLoss\[0\.5\]\): (\d+\.\d+)'
+    - Name: wQuantileLoss[0.9]
+      Regex: 'wQuantileLoss\[0\.9\]\): (\d+\.\d+)'
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    batch_size: '64'
+    epochs: '300'
+    forecaster_name: gluonts.model.transformer.TransformerEstimator
+    freq: D
+    num_batches_per_epoch: '100'
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_015707be
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m5.xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_015707be
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions: []
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    forecaster_name: gluonts.model.r_forecast.RForecastPredictor
+    freq: D
+    method: ets
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_54c71bdc
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m4.4xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_54c71bdc
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions: []
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    forecaster_name: gluonts.model.r_forecast.RForecastPredictor
+    freq: D
+    method: ets
+    prediction_length: '14'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_fbd5a724
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m4.4xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_fbd5a724
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions: []
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    forecaster_name: gluonts.model.r_forecast.RForecastPredictor
+    freq: D
+    method: ets
+    prediction_length: '21'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_1fff9fa3
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m4.4xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_1fff9fa3
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions: []
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    forecaster_name: gluonts.model.r_forecast.RForecastPredictor
+    freq: D
+    method: ets
+    prediction_length: '28'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_83f81e86
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m4.4xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_83f81e86
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+- AlgorithmSpecification:
+    MetricDefinitions: []
+    TrainingImage: 012345678901.dkr.ecr.eu-west-1.amazonaws.com/gluonts:test
+    TrainingInputMode: File
+  HyperParameters:
+    forecaster_name: gluonts.model.r_forecast.RForecastPredictor
+    freq: D
+    method: ets
+    prediction_length: '7'
+  InputDataConfig:
+  - ChannelName: train
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/train/data.json
+  - ChannelName: test
+    DataSource:
+      S3DataSource:
+        S3DataType: S3Prefix
+        S3Uri: s3://gluonts-run-tool/gluon_ts_datasets/constant/test/data.json
+  OutputDataConfig:
+    S3OutputPath: s3://dummy_bucket/dummy_name/dummy_name_54c71bdc
+  ResourceConfig:
+    InstanceCount: 1
+    InstanceType: ml.m4.4xlarge
+    VolumeSizeInGB: 32
+  RoleArn: dummy_role
+  StoppingCondition:
+    MaxRuntimeInSeconds: 86400
+  Tags:
+  - Key: run_configuration_id
+    Value: dummy_name_54c71bdc
+  - Key: started_with_runtool
+    Value: 'True'
+  - Key: experiment_name
+    Value: dummy_name
+  - Key: repeated_runs_group_id
+    Value: mocked_value
+  - Key: number_of_runs
+    Value: '1'
+  - Key: run_number
+    Value: '0'
+  TrainingJobName: mocked_name
+
+

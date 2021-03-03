@@ -1,4 +1,4 @@
-from typing import Union, Any
+from typing import Any, Union
 
 
 def get_item_from_path(data: Union[dict, list], path: str) -> Any:

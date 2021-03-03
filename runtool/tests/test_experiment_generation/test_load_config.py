@@ -1,6 +1,4 @@
 from typing import Any
-from runtool.recurse_config import Versions
-from toolz.dicttoolz import valmap
 
 from runtool.datatypes import (
     Algorithm,
@@ -10,7 +8,9 @@ from runtool.datatypes import (
     Experiment,
     Experiments,
 )
+from runtool.recurse_config import Versions
 from runtool.runtool import transform_config
+from toolz.dicttoolz import valmap
 
 DATASET = {
     "path": {

@@ -11,6 +11,7 @@ def assert_config_equal(source, expected):
 
 
 def load(testname):
+    # find data folder ./../test_data/<testname>
     path = Path(__file__).parent / "test_data" / testname
 
     expected_path = path / "expected.yml"

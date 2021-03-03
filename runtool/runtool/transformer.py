@@ -1,12 +1,11 @@
 from functools import partial
 
-from runtool.recurse_config import recursive_apply, Versions
+from runtool.recurse_config import Versions, recursive_apply
 from runtool.transformations import (
+    apply_each,
     apply_eval,
     apply_from,
     apply_ref,
-    apply_trial,
-    apply_each,
 )
 
 

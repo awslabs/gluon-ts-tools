@@ -1,6 +1,16 @@
-from functools import singledispatch
 import itertools
-from typing import Callable, Any
+from functools import singledispatch
+from typing import Any, Callable, Union
+from runtool.datatypes import (
+    Experiments,
+    Node,
+    ListNode,
+    Algorithm,
+    Dataset,
+    Algorithms,
+    Datasets,
+)
+from itertools import product, chain
 
 
 class Versions:
@@ -37,6 +47,28 @@ class Versions:
 
     def append(self, data: Any):
         self.__root__.append(data)
+
+    def append(self, data: Any):
+        self.__root__.append(data)
+
+    def __mul__(
+        self,
+        other: Union["Versions", Algorithms, Datasets, Algorithm, Dataset],
+    ) -> Experiments:
+        # multiply all children in self with all children in other
+        multiplied = [
+            item_self * item_other
+            for item_self, item_other in product(self, other)
+        ]
+
+        # Ensure that all multiplications resulted
+        # in an Experiment or Experiments object
+        check_type = lambda obj: isinstance(obj, Experiments)
+        assert all(map(check_type, multiplied))
+
+        # flatten list of Experiments objects into a single
+        # Experiments object.
+        return Experiments(list(chain.from_iterable(multiplied)))
 
 
 @singledispatch

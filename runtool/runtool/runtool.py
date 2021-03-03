@@ -1,8 +1,10 @@
+from collections import defaultdict
+from datetime import datetime
 from functools import singledispatch
 from pathlib import Path
 from typing import Any, Dict, Iterable, Union
-from collections import defaultdict
 
+import boto3
 import yaml
 from toolz import valmap
 
@@ -15,9 +17,40 @@ from runtool.datatypes import (
     Experiment,
     Experiments,
 )
+from runtool.dispatcher import JobsDispatcher
+from runtool.experiments_converter import generate_sagemaker_json
 from runtool.recurse_config import Versions
 from runtool.transformer import apply_transformations
-from functools import singledispatch
+
+
+class Client:
+    def __init__(
+        self, role: str, bucket: str, session: boto3.Session = boto3.Session()
+    ) -> None:
+        self.role = role
+        self.bucket = bucket
+        self.session = session
+        self.dispatcher = JobsDispatcher(session)
+
+    def run(
+        self,
+        experiment: Union[Experiments, Experiment],
+        experiment_name: str = "default experiment name",
+        runs: int = 1,
+        job_name_expression: str = None,
+        tags: dict = {},
+    ):
+        json_stream = generate_sagemaker_json(
+            experiment,
+            runs=runs,
+            experiment_name=experiment_name,
+            job_name_expression=job_name_expression,
+            tags=tags,
+            creation_time=datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S"),
+            bucket=self.bucket,
+            role=self.role,
+        )
+        return self.dispatcher.dispatch(json_stream)
 
 
 @singledispatch
