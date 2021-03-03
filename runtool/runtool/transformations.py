@@ -6,7 +6,6 @@ from uuid import uuid4
 from runtool.datatypes import DotDict
 from runtool.recurse_config import Versions, recursive_apply
 from runtool.utils import get_item_from_path, update_nested_dict
-from collections import UserDict
 
 
 def apply_from(node: dict, context: dict) -> dict:
@@ -279,7 +278,7 @@ def apply_trial(node: dict, locals: dict) -> Any:
     Any
         The transformed node.
     """
-    if not (isinstance(node, (dict, UserDict)) and "$eval" in node):
+    if not (isinstance(node, dict) and "$eval" in node):
         return node
 
     assert len(node) == 1, "$eval needs to be only value"

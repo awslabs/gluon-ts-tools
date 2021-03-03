@@ -10,7 +10,6 @@ from runtool.datatypes import (
 )
 from runtool.recurse_config import Versions
 from runtool.runtool import transform_config
-from toolz.dicttoolz import valmap
 
 DATASET = {
     "path": {

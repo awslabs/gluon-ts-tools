@@ -1,5 +1,5 @@
 from collections import UserDict, UserList
-from typing import Any, Iterable, List, Type, Union
+from typing import Any, Iterable, Union
 from toolz.dicttoolz import valmap
 
 

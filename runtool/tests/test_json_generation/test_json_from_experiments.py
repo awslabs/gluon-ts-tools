@@ -1,6 +1,5 @@
 from runtool.datatypes import Algorithm, Experiment, Dataset
 from runtool.experiments_converter import generate_sagemaker_json
-from datetime import datetime
 import yaml
 
 ALGORITHM = Algorithm(
