@@ -70,9 +70,9 @@ class JobsDispatcher:
 
         # overwrites the current line in the terminal
         # \033[K deletes the remaining characters of the line
-        log = lambda message: print(
+        log = lambda message, end="\r": print(
             f"\033[K{len(runs)-remaining_jobs}/{len(runs)} jobs submitted, {message}",
-            end="\r",
+            end=end,
         )
 
         print(f"total jobs to run: {remaining_jobs}")
@@ -122,5 +122,5 @@ class JobsDispatcher:
                         " Instance limit reached, pausing for 60 seconds"
                     ),
                 )
-        log("Done!")
+        log("Done!", "\n")
         return responses
