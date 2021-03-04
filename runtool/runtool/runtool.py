@@ -24,9 +24,14 @@ from runtool.transformer import apply_transformations
 
 
 class Client:
+    """
+    The Client class is the interface a user uses
+    in order to start training jobs on SageMaker.
+    """
+
     def __init__(
         self, role: str, bucket: str, session: boto3.Session = boto3.Session()
-    ) -> None:
+    ):
         self.role = role
         self.bucket = bucket
         self.session = session
@@ -39,7 +44,31 @@ class Client:
         runs: int = 1,
         job_name_expression: str = None,
         tags: dict = {},
-    ):
+    ) -> Dict[str, str]:
+        """
+        This method takes an Experiment or a Experiments object and
+        executes these on SageMaker.
+
+        Parameters
+        ----------
+        experiment
+            A `runtool.datatypes.Experiment` object
+        experiment_name
+            The name of the experiment
+        runs
+            Number of times each job should be repeated
+        job_name_expression
+            A python expression which will be used to set
+            the `TrainingJobName` field in the generated JSON.
+        tags
+            Any tags that should be set in the training job JSON
+
+        Returns
+        -------
+        Dict
+            Dictionary with the training job name as a key and the AWS ARN of the
+            training job as a value.
+        """
         json_stream = generate_sagemaker_json(
             experiment,
             runs=runs,

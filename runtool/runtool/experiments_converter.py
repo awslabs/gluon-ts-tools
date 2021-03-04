@@ -3,7 +3,7 @@ from datetime import datetime
 from functools import partial, singledispatch
 from hashlib import sha1
 from itertools import chain
-from typing import DefaultDict, Iterable, Optional
+from typing import Any, DefaultDict, Dict, Iterable, List, Optional
 
 from pydantic import BaseModel
 
@@ -14,14 +14,12 @@ from runtool.utils import update_nested_dict
 from toolz.dicttoolz import valmap
 
 
-def hash(data):
+class Job(BaseModel):
     """
-    Reproducible hash
+    Datastructure for storing all data required to generate a Json
+    for starting a training job on SageMaker.
     """
-    return str(sha1(str(data).encode("UTF-8")).hexdigest()[:8])
 
-
-class ExperimentConverter(BaseModel):
     experiment: dict
     tags: dict
     runs: int
@@ -32,197 +30,261 @@ class ExperimentConverter(BaseModel):
     role: str
     job_name_expression: Optional[str]
 
-    def generate_tags(self, run_configuration: str) -> list:
-        tags = self.experiment["algorithm"].get("tags", {})
-        tags.update(self.experiment["dataset"].get("tags", {}))
-        tags.update(
-            {
-                "run_configuration_id": run_configuration,  # identifies dataset/algorithm used
-                "started_with_runtool": True,  # identifies that runtool started this job
-                "experiment_name": self.experiment_name,  # identifies the experiment the job belongs to
-                "repeated_runs_group_id": hash(  # identifies groups of runs started together
-                    run_configuration + str(datetime.now())
-                ),
-                "number_of_runs": str(self.runs),
-            }
+
+def hash(data):
+    """
+    Reproducible hash
+    """
+    return str(sha1(str(data).encode("UTF-8")).hexdigest()[:8])
+
+
+def calculate_run_configuration(job: Job) -> str:
+    """
+    The run configuration describes the dataset and
+    algorithm combination of the job.
+    This is done by hashing the image, instance type,
+    hyperparameters and dataset of the job. The resulting
+    string of this function has the form:
+
+    "<experiment_name>_<hash>"
+
+    """
+    trial_id = "".join(
+        (
+            job.experiment["algorithm"]["image"],
+            job.experiment["algorithm"]["instance"],
+            json.dumps(
+                job.experiment["algorithm"]["hyperparameters"],
+                sort_keys=True,
+            )
+            if "hyperparameters" in job.experiment["algorithm"]
+            else "",
+            json.dumps(job.experiment["dataset"], sort_keys=True),
         )
-        tags.update(self.tags)
+    )
+    return f"{job.experiment_name}_{hash(trial_id)}"
 
-        return [
-            {"Key": key, "Value": str(value)} for key, value in tags.items()
-        ]
 
-    def calculate_run_configuration(self) -> str:
-        # the run configuration uniquely describes
-        # the dataset and algorithm combination of the trial
-        # Of some reason, doing hash(trial) is non deterministic
-        # below is a temporary workaround which makes the run_configuration determenistic
-        trial_id = "".join(
-            (
-                self.experiment["algorithm"]["image"],
-                self.experiment["algorithm"]["instance"],
-                json.dumps(
-                    self.experiment["algorithm"]["hyperparameters"],
-                    sort_keys=True,
+def generate_tags(job: Job, run_configuration: str) -> List[Dict[str, str]]:
+    """
+    Generates a list of tags where each tag has the format:
+
+        {"Key": ..., "Value": ...}
+
+    This list will be populated with any tags in `job.experiment`.
+    Further some default tags are added which aids in identifying
+    and grouping the started jobs:
+
+    `run_configuration_id`
+    Unique tag which identifies the algorithm, hyperparameters & dataset
+    used in the job.
+
+    `started_with_runtool`
+    identifies that the runtool was used to start this job
+
+    `experiment_name`
+    The name of the experiment which this jobs is a part of.
+
+    `repeated_runs_group_id`
+    If a job should be run several times in an experiment
+    each of the repeated runs of it will have the same
+    `repeated_runs_group_id`.
+
+    `number_of_runs`
+    The number of times the job should be run.
+    """
+    tags = {}
+    tags.update(job.experiment["algorithm"].get("tags", {}))
+    tags.update(job.experiment["dataset"].get("tags", {}))
+    tags.update(
+        {
+            "run_configuration_id": run_configuration,
+            "started_with_runtool": True,
+            "experiment_name": job.experiment_name,
+            "repeated_runs_group_id": hash(
+                run_configuration + str(datetime.now())
+            ),
+            "number_of_runs": str(job.runs),
+        }
+    )
+    tags.update(job.tags)
+
+    return [{"Key": key, "Value": str(value)} for key, value in tags.items()]
+
+
+def generate_metrics(algorithm: dict, dataset: dict) -> List[Dict[str, str]]:
+    """
+    Extracts any metric definitions in the algorithm and dataset
+    of the experiment in the job. These metric definitions are then
+    compiled into a list with the format required by SageMaker API.
+    """
+    return [
+        {"Name": key, "Regex": value}
+        for key, value in chain(
+            algorithm.get("metrics", {}).items(),
+            dataset.get("metrics", {}).items(),
+        )
+    ]
+
+
+def generate_sagemaker_overrides(
+    algorithm: dict, dataset: dict
+) -> Dict[str, Any]:
+    """
+    This function extracts items from the algorithm and the dataset
+    where the key has the structure:
+
+    `$sagemaker.<path>`.
+
+    The extracted `<path>` is then used to populate a new `dict` where
+    the value at `<path>` is set to that of the `$sagemaker.<path>` in the source
+    dict.
+
+    i.e.
+
+    >>> algorithm={$sagmaker.hello.world: 10}
+    >>> dataset={"smth": 1}
+    >>> generate_sagemaker_overrides(algorithm, dataset) == {
+    ...     "hello" {"world": 10}
+    ... }
+    True
+
+    """
+    # generate tuple of format: Tuple[List, Any]
+    # this tuple will only contain items having
+    # a key starting with "$sagemaker."
+    # i.e.
+    # {"$sagemaker.hello.world": 10, "smth": 2}
+    # ->
+    # (["hello", "world"], 10)
+
+    sagemaker_overrides = (
+        (key.lstrip("$sagemaker.").split("."), value)
+        for key, value in chain(
+            algorithm.items(),
+            dataset.items(),
+        )
+        if key.startswith("$sagemaker.")
+    )
+
+    # generate a dictionary from the tuple
+    # (["hello", "world"], 10)
+    # ->
+    # {"hello" {"world": 10}}
+    overrides = DefaultDict(dict)
+    for path, value in sagemaker_overrides:
+        current = overrides
+        while path:
+            key = path.pop(0)
+            if not path:
+                current[key] = value
+            else:
+                current = current[key]
+    return dict(overrides)
+
+
+def generate_job_name(job: Job, run: int, run_configuration: str) -> str:
+    """
+    Generates a training job name for a sagemaker job.
+    There is a hierarchy of how a job should be named.
+    Any job name expression provided within the job.job_name_expression has
+    highest priority.
+    Thereafter if a `$job_name` key exists in the `job.experiment["algorithm"]`
+    or the `job.experiment["dataset"]` its value will be used.
+    If no custom name has been provided, a default training job name is generated.
+    """
+    # user naming convention has highest priority
+    if job.job_name_expression:
+        return apply_trial(
+            node={"$eval": job.job_name_expression},
+            locals=DotDict(
+                dict(
+                    __trial__=job.experiment,
+                    run=run,
+                    run_configuration=run_configuration,
                 )
-                if "hyperparameters" in self.experiment["algorithm"]
-                else "",
-                json.dumps(self.experiment["dataset"], sort_keys=True),
-            )
-        )
-        return f"{self.experiment_name}_{hash(trial_id)}"
-
-    def generate_metrics(self) -> list:
-        return [
-            {"Name": key, "Regex": value}
-            for key, value in chain(
-                self.experiment["algorithm"].get("metrics", {}).items(),
-                self.experiment["dataset"].get("metrics", {}).items(),
-            )
-        ]
-
-    def generate_sagemaker_overrides(self) -> dict:
-        """
-        if a key looks like $sagemaker.<some path> within the
-        algorithm or dataset, the final sagemaker json should
-        have the value of <some path> set to the value of the
-        dictionary item with key $sagemaker.<some path>.
-
-        i.e.
-
-        {$sagmaker.hello.world: 10}
-
-        will result in that in the JSON sent to SageMaker will
-        be updated with the following item:
-
-        {"hello" {"world": 10}}
-
-        """
-        # generate tuple of format: Tuple[List, Any]
-        # this tuple will only contain items having
-        # a key which starts with "$sagemaker."
-        # i.e.
-        # {"$sagemaker.hello.world": 10, "smth": 2}
-        # generates:
-        # (["hello", "world"], 10)
-
-        sagemaker_overrides = (
-            (key.lstrip("$sagemaker.").split("."), value)
-            for key, value in chain(
-                self.experiment["algorithm"].items(),
-                self.experiment["dataset"].items(),
-            )
-            if key.startswith("$sagemaker.")
+            ),
         )
 
-        # generate a dictionary from the tuple
-        # (["hello", "world"], 10)
-        # ->
-        # {"hello" {"world": 10}}
-        overrides = DefaultDict(dict)
-        for path, value in sagemaker_overrides:
-            current = overrides
-            while path:
-                key = path.pop(0)
-                if not path:
-                    current[key] = value
-                else:
-                    current = current[key]
-        return dict(overrides)
+    # thereafter any jobnames added within the config has prio
+    if "$job_name" in job.experiment["algorithm"]:
+        return job.experiment["algorithm"]["$job_name"]
 
-    def generate_job_name(self, run: int, run_configuration: str) -> str:
-        """
-        Generates a training job name for a sagemaker job.
-        User provided jobnames passed to the ExperimentConverter has priority
-        thereafter any $job_name keys in the algorithm or dataset will be
-        used. If none exists, a default training job name will be generated.
-        """
-        # user naming convention has highest priority
-        if self.job_name_expression:
-            return apply_trial(
-                node={"$eval": self.job_name_expression},
-                locals=DotDict(
-                    dict(
-                        __trial__=self.experiment,
-                        run=run,
-                        run_configuration=run_configuration,
-                    )
-                ),
-            )
+    # job names in the dataset has lower priority
+    if "$job_name" in job.experiment["dataset"]:
+        return job.experiment["dataset"]["$job_name"]
 
-        # thereafter any jobnames added within the config has prio
-        elif "$job_name" in self.experiment["algorithm"]:
-            return self.experiment["algorithm"]["$job_name"]
-        elif "$job_name" in self.experiment["dataset"]:
-            return self.experiment["dataset"]["$job_name"]
+    # fallback on default naming
+    return (
+        f"config-{hash(job.experiment)}"
+        f"-date-{job.creation_time}"
+        f"-runid-{hash(run_configuration)}"
+        f"-run-{run}"
+    )
 
-        # fallback on default naming
-        return (
-            f"config-{hash(self.experiment)}"
-            f"-date-{self.creation_time}"
-            f"-runid-{hash(run_configuration)}"
-            f"-run-{run}"
-        )
 
-    def generate_hyperparameters(self) -> dict:
-        return {
-            key: str(
-                value
-            )  # important to cast to string sagemaker to avoid sagemaker crash
-            for key, value in self.experiment["algorithm"]
-            .get("hyperparameters", {})
-            .items()
+def generate_datasets(dataset: dict):
+    return [
+        {
+            "ChannelName": name,
+            "DataSource": {
+                "S3DataSource": {
+                    "S3DataType": "S3Prefix",
+                    "S3Uri": uri,
+                }
+            },
+        }
+        for name, uri in dataset["path"].items()
+    ]
+
+
+def generate_job_json(job: Job) -> Iterable[dict]:
+    """
+    Given a Job object, generates Json which can be used
+    to create training jobs on AWS SageMaker.
+    """
+    run_configuration = calculate_run_configuration(job)
+    tags = generate_tags(job, run_configuration)
+    datasets = generate_datasets(job.experiment["dataset"])
+    metrics = generate_metrics(
+        job.experiment["algorithm"], job.experiment["dataset"]
+    )
+    overrides = generate_sagemaker_overrides(
+        job.experiment["algorithm"], job.experiment["dataset"]
+    )
+    hyperparameters = valmap(
+        str, job.experiment["algorithm"].get("hyperparameters", {})
+    )
+
+    s3_path = f"s3://{job.bucket}/{job.experiment_name}/{run_configuration}"
+
+    for run in range(job.runs):
+        job_name = generate_job_name(job, run, run_configuration)
+        json_ = {
+            "AlgorithmSpecification": {
+                "TrainingImage": job.experiment["algorithm"]["image"],
+                "TrainingInputMode": "File",
+                "MetricDefinitions": metrics,
+            },
+            "HyperParameters": hyperparameters,
+            "InputDataConfig": datasets,
+            "OutputDataConfig": {"S3OutputPath": s3_path},
+            "ResourceConfig": {
+                "InstanceCount": 1,
+                "InstanceType": job.experiment["algorithm"]["instance"],
+                "VolumeSizeInGB": 32,
+            },
+            "StoppingCondition": {"MaxRuntimeInSeconds": 86400},
+            "RoleArn": job.role,
+            "TrainingJobName": job_name,
+            "Tags": [
+                *tags,
+                {"Key": "run_number", "Value": str(run)},  # add current run
+            ],
         }
 
-    def run(self) -> Iterable[dict]:
-        run_configuration = self.calculate_run_configuration()
-        tags = self.generate_tags(run_configuration)
-        metrics = self.generate_metrics()
-        hyperparameters = self.generate_hyperparameters()
-        overrides = self.generate_sagemaker_overrides()
-
-        for run in range(self.runs):
-            job_name = self.generate_job_name(run, run_configuration)
-            json_ = {
-                "AlgorithmSpecification": {
-                    "TrainingImage": self.experiment["algorithm"]["image"],
-                    "TrainingInputMode": "File",
-                    "MetricDefinitions": metrics,
-                },
-                "HyperParameters": {
-                    key: str(value) for key, value in hyperparameters.items()
-                },
-                "InputDataConfig": [
-                    {
-                        "ChannelName": name,
-                        "DataSource": {
-                            "S3DataSource": {
-                                "S3DataType": "S3Prefix",
-                                "S3Uri": uri,
-                            }
-                        },
-                    }
-                    for name, uri in self.experiment["dataset"]["path"].items()
-                ],
-                "OutputDataConfig": {
-                    "S3OutputPath": f"s3://{self.bucket}/{self.experiment_name}/{run_configuration}"
-                },
-                "ResourceConfig": {
-                    "InstanceCount": 1,
-                    "InstanceType": self.experiment["algorithm"]["instance"],
-                    "VolumeSizeInGB": 32,
-                },
-                "StoppingCondition": {"MaxRuntimeInSeconds": 86400},
-                "RoleArn": self.role,
-                "TrainingJobName": f"{job_name}",
-                "Tags": [
-                    *tags,
-                    {"Key": "run_number", "Value": str(run)},
-                ],
-            }
-
-            # apply any custom sagemaker json
-            yield update_nested_dict(json_, overrides)
+        # apply any custom sagemaker json
+        yield update_nested_dict(json_, overrides)
 
 
 @singledispatch
@@ -236,35 +298,71 @@ def generate_sagemaker_json(
     bucket: str,
     role: str,
 ) -> Iterable[dict]:
-    # recurse_config cannot handle UserDict and UserList
-    # Thus convert experiment to a normal dict
-    experiment = experiment.to_dict()
+    """
+    Converts an `Experiment` object into one or more dicts
+    which can be used to start training jobs on SageMaker.
 
-    # resolve $trial in experiments
+    Parameters
+    ----------
+    experiment
+        A `runtool.datatypes.Experiment` object
+    runs
+        Number of times each job should be repeated
+    experiment_name
+        The name of the experiment
+    job_name_expression
+        A python expression which will be used to set
+        the `TrainingJobName` field in the generated JSON.
+    tags
+        Any tags that should be set in the training job JSON
+    creation_time
+        The time which the current experiment was created.
+        This needs to be passed as a single experiment run may contain
+        multiple Experiment objects.
+    bucket
+        The AWS S3 bucket AWS SageMaker should use as an outputdirectory
+        for storing model data.
+    role
+        The AWS IAM Role to use when starting training jobs
+
+    Returns
+    -------
+    Iterable
+        Dict
+            JSON that can be used to create training jobs.
+    """
+    # we know here which algorithm is used with which dataset
+    # thus we can now resolve $eval in the experiment.
     experiment = DotDict(
         recursive_apply(
-            experiment, partial(apply_trial, locals={"__trial__": experiment})
+            experiment.to_dict(),
+            partial(apply_trial, locals=dict(__trial__=experiment)),
         )
     )
 
     # generate jsons for calling the sagemaker api
-    converter = ExperimentConverter(
-        experiment=experiment,
-        runs=runs,
-        experiment_name=experiment_name,
-        job_name_expression=job_name_expression,
-        tags=tags,
-        creation_time=creation_time,
-        bucket=bucket,
-        role=role,
+    return generate_job_json(
+        Job(
+            experiment=experiment,
+            runs=runs,
+            experiment_name=experiment_name,
+            job_name_expression=job_name_expression,
+            tags=tags,
+            creation_time=creation_time,
+            bucket=bucket,
+            role=role,
+        )
     )
-    return converter.run()
 
 
 @generate_sagemaker_json.register
 def generate_sagemaker_json_multiple(
     experiments: Experiments, **kwargs
 ) -> Iterable[dict]:
+    """
+    Converts `Experiments` objects into an iterable collection of
+    dicts which can be used to start training jobs on SageMaker.
+    """
     return chain.from_iterable(
         generate_sagemaker_json(experiment, **kwargs)
         for experiment in experiments
