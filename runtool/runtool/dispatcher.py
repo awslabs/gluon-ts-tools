@@ -1,19 +1,18 @@
 import sys
 import time
-from typing import Dict, Iterable, List
-
-import boto3
+from typing import Dict, Iterable, List, Union
+from collections import defaultdict
 import botocore
+from toolz.itertoolz import groupby
 
 
 class JobsDispatcher:
     """
-    The JobsDispatcher class interfaces with SageMaker in order
-    to dispatch training jobs.
+    The JobsDispatcher class starts training jobs in SageMaker.
     """
 
-    def __init__(self, session: boto3.Session):
-        self.client = session.client("sagemaker")
+    def __init__(self, client: botocore.client):
+        self.client = client
 
     def timeout_with_printer(self, timeout, message="") -> None:
         """
@@ -21,33 +20,78 @@ class JobsDispatcher:
         This method waits one second between prints.
         """
         for remaining in range(timeout, 0, -1):
-            sys.stdout.write(
-                "\r{}, {:2d} seconds remaining.".format(message, remaining)
+            print(
+                f"\r\033[K{message}, {remaining:2d} seconds remaining.", end=""
             )
-            sys.stdout.flush()
             time.sleep(1)
 
-        sys.stdout.write("\r")
-        sys.stdout.flush()
+        print("\r", end="")
 
-    def group_by_instance_type(_, jobs: Iterable[dict]) -> List[Iterable]:
+    def group_by_instance_type(self, jobs: Iterable[dict]) -> List[Iterable]:
         """
-        This method sorts all the jobs into different queues depending
+        This method groups all the jobs into different queues depending
         on which instance each job should be run.
         This returns a list of the different queues.
-        """
-        instance_queues = {}
-        for job in jobs:
-            instance_type = job["ResourceConfig"]["InstanceType"]
-            if instance_type in instance_queues:
-                instance_queues[instance_type].append(job)
-            else:
-                instance_queues[instance_type] = [job]
-        return list(instance_queues.values())
 
-    def dispatch(self, runs: Iterable[dict]) -> Dict[str, str]:
+        >>> result =group_by_instance_type(
+        ...     [
+        ...         {"ResourceConfig": {"InstanceType": 1}, "name": 1},
+        ...         {"ResourceConfig": {"InstanceType": 2}, "name": 2},
+        ...         {"ResourceConfig": {"InstanceType": 2}, "name": 3},
+        ...     ]
+        ... )
+        >>> result == [
+        ...     [
+        ...         {"ResourceConfig": {"InstanceType": 1}, "name": 1}
+        ...     ],
+        ...     [
+        ...         {"ResourceConfig": {"InstanceType": 2}, "name": 2},
+        ...         {"ResourceConfig": {"InstanceType": 2}, "name": 3},
+        ...     ],
+        ... ]
+        True
         """
-        This method uses the dictionaries in the `runs` parameter
+        return list(
+            groupby(
+                lambda job: job["ResourceConfig"]["InstanceType"], jobs
+            ).values()
+        )
+
+    def start_training_job(self, job: dict, max_retries: int) -> dict:
+        """
+        Tries to start a single training jobs on SageMaker.
+        Returns the response from SageMaker or, if no more instances
+        are available,returns an empty response.
+        If throttled, this method sleeps before trying again.
+        """
+        retries = 0
+        while True:
+            try:
+                response = self.client.create_training_job(**job)
+                time.sleep(4)  # wait to avoid throttling
+                return response
+            except self.client.exceptions.ResourceLimitExceeded:
+                # all instances of the type used by the job is busy
+                return {}
+            except botocore.exceptions.ClientError as error:
+                if (
+                    error.response["Error"]["Code"] == "ThrottlingException"
+                    and retries < max_retries
+                ):
+                    # exponential backoff as recommended by AWS
+                    self.timeout_with_printer(
+                        60 + 2 ** retries,
+                        "API call limit exceeded, Sleeping...",
+                    )
+                    retries += 1
+                else:
+                    raise error
+
+    def dispatch(
+        self, jobs: List[dict], max_retries: int = 10
+    ) -> Dict[str, str]:
+        """
+        This method uses the dictionaries in the `jobs` parameter
         to dispatch training jobs to SageMaker using boto3.
         Each of the dictionaries must be valid arguments to the
         create_training_job method of boto3 which is detailed here:
@@ -62,63 +106,38 @@ class JobsDispatcher:
         If at any point, all resources are busy the dispatcher waits
         for resources to become available.
         """
-        runs = list(runs)
-        queues = self.group_by_instance_type(runs)
-        remaining_jobs = len(runs)
+        queues = self.group_by_instance_type(jobs)
+        num_remaining = len(jobs)
         responses = {}
-        retries = 0  # used for exponential backoff if throttled
 
         # overwrites the current line in the terminal
         # \033[K deletes the remaining characters of the line
         log = lambda message, end="\r": print(
-            f"\033[K{len(runs)-remaining_jobs}/{len(runs)} jobs submitted, {message}",
+            f"\033[K{len(jobs)-num_remaining}/{len(jobs)} jobs submitted, {message}",
             end=end,
         )
 
-        print(f"total jobs to run: {remaining_jobs}")
-        while remaining_jobs:
+        print(f"total jobs to run: {num_remaining}")
+        while num_remaining:
             for queue in queues:
                 # 1. run as many jobs as possible for the given queue
                 while queue:
                     run = queue.pop()
                     log("submitting job: {}".format(run["TrainingJobName"]))
-                    try:
-                        responses[
-                            run["TrainingJobName"]
-                        ] = self.client.create_training_job(**run)
-                        remaining_jobs -= 1
-                        time.sleep(4)
-                    except self.client.exceptions.ResourceLimitExceeded:
-                        # all resources busy,
+                    response = self.start_training_job(run, max_retries)
+
+                    if response:
+                        responses[run["TrainingJobName"]] = response
+                        num_remaining -= 1
+                    else:
                         queue.append(run)
                         break
-                    except botocore.exceptions.ValidationError as e:
-                        print(
-                            "an error occured, likely due to invalid instance type being choosen\n",
-                            "you should stop any started jobs in sagemaker, fix the issue and rerun this program\n",
-                            "the error was:",
-                            e,
-                        )
-                        return False
-                    except botocore.exceptions.ClientError as error:
-                        queue.append(run)
-                        if (
-                            error.response["Error"]["Code"]
-                            == "ThrottlingException"
-                        ):
-                            log("API call limit exceeded; Sleeping...\033[K")
-                            # exponential backoff as recommended by AWS
-                            # minimum wait is 10 minutes
-                            retries += 1
-                            self.timeout_with_printer(10 * 60 + 10 ** retries)
-                        else:
-                            raise Exception(f"Unknown error occurred: {error}")
 
-            if remaining_jobs:
+            if num_remaining:
                 self.timeout_with_printer(
                     60,
                     (
-                        f"\r{len(runs) - remaining_jobs}/{len(runs)} jobs submitted."
+                        f"\r{len(jobs) - num_remaining}/{len(jobs)} jobs submitted."
                         " Instance limit reached, pausing for 60 seconds"
                     ),
                 )

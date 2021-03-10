@@ -35,7 +35,7 @@ class Client:
         self.role = role
         self.bucket = bucket
         self.session = session
-        self.dispatcher = JobsDispatcher(session)
+        self.dispatcher = JobsDispatcher(session.client("sagemaker"))
 
     def run(
         self,
@@ -79,7 +79,7 @@ class Client:
             bucket=self.bucket,
             role=self.role,
         )
-        return self.dispatcher.dispatch(json_stream)
+        return self.dispatcher.dispatch(list(json_stream))
 
 
 @singledispatch

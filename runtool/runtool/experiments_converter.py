@@ -3,9 +3,10 @@ from datetime import datetime
 from functools import partial, singledispatch
 from hashlib import sha1
 from itertools import chain
-from typing import Any, DefaultDict, Dict, Iterable, List, Optional
-
+from typing import Any, Dict, Iterable, List, Optional, Union
+from collections import defaultdict
 from pydantic import BaseModel
+from toolz.dicttoolz import update_in
 
 from runtool.datatypes import DotDict, Experiment, Experiments
 from runtool.recurse_config import recursive_apply
@@ -31,14 +32,14 @@ class Job(BaseModel):
     job_name_expression: Optional[str]
 
 
-def hash(data):
+def reproducible_hash(data):
     """
     Reproducible hash
     """
     return str(sha1(str(data).encode("UTF-8")).hexdigest()[:8])
 
 
-def calculate_run_configuration(job: Job) -> str:
+def generate_run_configuration(job: Job) -> str:
     """
     The run configuration describes the dataset and
     algorithm combination of the job.
@@ -49,20 +50,19 @@ def calculate_run_configuration(job: Job) -> str:
     "<experiment_name>_<hash>"
 
     """
+    hyperparameters = job.experiment["algorithm"].get("hyperparameters", "")
+    if hyperparameters:
+        hyperparameters = json.dumps(hyperparameters, sort_keys=True)
+
     trial_id = "".join(
         (
             job.experiment["algorithm"]["image"],
             job.experiment["algorithm"]["instance"],
-            json.dumps(
-                job.experiment["algorithm"]["hyperparameters"],
-                sort_keys=True,
-            )
-            if "hyperparameters" in job.experiment["algorithm"]
-            else "",
+            hyperparameters,
             json.dumps(job.experiment["dataset"], sort_keys=True),
         )
     )
-    return f"{job.experiment_name}_{hash(trial_id)}"
+    return f"{job.experiment_name}_{reproducible_hash(trial_id)}"
 
 
 def generate_tags(job: Job, run_configuration: str) -> List[Dict[str, str]]:
@@ -101,7 +101,7 @@ def generate_tags(job: Job, run_configuration: str) -> List[Dict[str, str]]:
             "run_configuration_id": run_configuration,
             "started_with_runtool": True,
             "experiment_name": job.experiment_name,
-            "repeated_runs_group_id": hash(
+            "repeated_runs_group_id": reproducible_hash(
                 run_configuration + str(datetime.now())
             ),
             "number_of_runs": str(job.runs),
@@ -159,7 +159,7 @@ def generate_sagemaker_overrides(
     # (["hello", "world"], 10)
 
     sagemaker_overrides = (
-        (key.lstrip("$sagemaker.").split("."), value)
+        (key.split(".")[1:], value)
         for key, value in chain(
             algorithm.items(),
             dataset.items(),
@@ -170,17 +170,12 @@ def generate_sagemaker_overrides(
     # generate a dictionary from the tuple
     # (["hello", "world"], 10)
     # ->
-    # {"hello" {"world": 10}}
-    overrides = DefaultDict(dict)
+    # {"hello": {"world": 10}}
+    overrides = {}
     for path, value in sagemaker_overrides:
-        current = overrides
-        while path:
-            key = path.pop(0)
-            if not path:
-                current[key] = value
-            else:
-                current = current[key]
-    return dict(overrides)
+        overrides = update_in(overrides, path, lambda _: value)
+
+    return overrides
 
 
 def generate_job_name(job: Job, run: int, run_configuration: str) -> str:
@@ -216,9 +211,9 @@ def generate_job_name(job: Job, run: int, run_configuration: str) -> str:
 
     # fallback on default naming
     return (
-        f"config-{hash(job.experiment)}"
+        f"config-{reproducible_hash(job.experiment)}"
         f"-date-{job.creation_time}"
-        f"-runid-{hash(run_configuration)}"
+        f"-runid-{reproducible_hash(run_configuration)}"
         f"-run-{run}"
     )
 
@@ -243,7 +238,7 @@ def generate_job_json(job: Job) -> Iterable[dict]:
     Given a Job object, generates Json which can be used
     to create training jobs on AWS SageMaker.
     """
-    run_configuration = calculate_run_configuration(job)
+    run_configuration = generate_run_configuration(job)
     tags = generate_tags(job, run_configuration)
     datasets = generate_datasets(job.experiment["dataset"])
     metrics = generate_metrics(
@@ -289,7 +284,7 @@ def generate_job_json(job: Job) -> Iterable[dict]:
 
 @singledispatch
 def generate_sagemaker_json(
-    experiment: Experiment,
+    experiment: Union[Experiment, Experiments],
     runs: int,
     experiment_name: str,
     job_name_expression: str,
@@ -331,11 +326,26 @@ def generate_sagemaker_json(
         Dict
             JSON that can be used to create training jobs.
     """
+    if isinstance(experiment, Experiments):
+        return chain.from_iterable(
+            generate_sagemaker_json(
+                trial,
+                runs,
+                experiment_name,
+                job_name_expression,
+                tags,
+                creation_time,
+                bucket,
+                role,
+            )
+            for trial in experiment
+        )
+
     # we know here which algorithm is used with which dataset
     # thus we can now resolve $eval in the experiment.
     experiment = DotDict(
         recursive_apply(
-            experiment.to_dict(),
+            experiment.as_dict(),
             partial(apply_trial, locals=dict(__trial__=experiment)),
         )
     )

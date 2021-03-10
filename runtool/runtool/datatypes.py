@@ -446,6 +446,16 @@ class Node(UserDict):
 
         raise TypeError
 
+    def as_dict(self):
+        def converter(value):
+            if hasattr(value, "as_dict"):
+                return value.as_dict()
+            if isinstance(value, UserDict):
+                return dict(value)
+            return value
+
+        return valmap(converter, self)
+
 
 class Algorithm(Node):
     """
@@ -634,9 +644,6 @@ class Experiment(Node):
                 "An Experiment requires a dict containing a valid "
                 f"Dataset and an Algorithm, got: {dict(self)}"
             )
-
-    def to_dict(self):
-        return dict(valmap(dict, self))
 
     @classmethod
     def from_nodes(cls, node_1: dict, node_2: dict) -> "Experiment":
