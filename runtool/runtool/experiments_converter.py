@@ -363,17 +363,3 @@ def generate_sagemaker_json(
             role=role,
         )
     )
-
-
-@generate_sagemaker_json.register
-def generate_sagemaker_json_multiple(
-    experiments: Experiments, **kwargs
-) -> Iterable[dict]:
-    """
-    Converts `Experiments` objects into an iterable collection of
-    dicts which can be used to start training jobs on SageMaker.
-    """
-    return chain.from_iterable(
-        generate_sagemaker_json(experiment, **kwargs)
-        for experiment in experiments
-    )
