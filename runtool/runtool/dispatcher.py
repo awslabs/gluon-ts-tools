@@ -1,7 +1,5 @@
-import sys
 import time
-from typing import Dict, Iterable, List, Union
-from collections import defaultdict
+from typing import Dict, Iterable, List
 import botocore
 from toolz.itertoolz import groupby
 
@@ -70,10 +68,9 @@ class JobsDispatcher:
                 response = self.client.create_training_job(**job)
                 time.sleep(4)  # wait to avoid throttling
                 return response
-            except self.client.exceptions.ResourceLimitExceeded:
-                # all instances of the type used by the job is busy
-                return {}
             except botocore.exceptions.ClientError as error:
+                if error.response["Error"]["Code"] == "ResourceLimitExceeded":
+                    return {}
                 if (
                     error.response["Error"]["Code"] == "ThrottlingException"
                     and retries < max_retries
@@ -97,7 +94,7 @@ class JobsDispatcher:
         create_training_job method of boto3 which is detailed here:
         https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sagemaker.html#SageMaker.Client.create_training_job
 
-        The passed dictionaries will be sorted into different queues
+        The passed dictionaries are sorted into different queues
         based on the instance the jobs should be run on.
         Thereafter, jobs are dispatched from one of the queues while
         instances are available on the AWS account.
@@ -120,7 +117,6 @@ class JobsDispatcher:
         print(f"total jobs to run: {num_remaining}")
         while num_remaining:
             for queue in queues:
-                # 1. run as many jobs as possible for the given queue
                 while queue:
                     run = queue.pop()
                     log("submitting job: {}".format(run["TrainingJobName"]))
