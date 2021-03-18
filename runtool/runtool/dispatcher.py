@@ -2,19 +2,18 @@ import time
 from typing import Dict, Iterable, List
 import botocore
 from toolz.itertoolz import groupby
+from itertools import count
 
 
-class JobsDispatcher:
-    """
-    The JobsDispatcher class starts training jobs in SageMaker.
-    """
+class JobDispatcher:
+    """The JobDispatcher class starts training jobs in SageMaker."""
 
-    def __init__(self, client: botocore.client):
-        self.client = client
+    def __init__(self, sagemaker: botocore.client):
+        self.sagemaker = sagemaker
 
     def timeout_with_printer(self, timeout, message="") -> None:
         """
-        Prints a message with a countdown over and over on the same row.
+        Print a message with a countdown over and over on the same row.
         This method waits one second between prints.
         """
         for remaining in range(timeout, 0, -1):
@@ -57,51 +56,43 @@ class JobsDispatcher:
 
     def start_training_job(self, job: dict, max_retries: int) -> dict:
         """
-        Tries to start a single training jobs on SageMaker.
-        Returns the response from SageMaker or, if no more instances
-        are available,returns an empty response.
-        If throttled, this method sleeps before trying again.
+        Start a training job in SageMaker, if throttled, sleep before trying again.
+
+        Returns the response from SageMaker or `{}` if no resources remain.
         """
-        retries = 0
-        while True:
+        for attempt in count(start=1):
             try:
-                response = self.client.create_training_job(**job)
-                time.sleep(4)  # wait to avoid throttling
+                response = self.sagemaker.create_training_job(**job)
                 return response
             except botocore.exceptions.ClientError as error:
                 if error.response["Error"]["Code"] == "ResourceLimitExceeded":
                     return {}
-                if (
+                elif (
                     error.response["Error"]["Code"] == "ThrottlingException"
-                    and retries < max_retries
+                    and attempt < max_retries
                 ):
                     # exponential backoff as recommended by AWS
                     self.timeout_with_printer(
-                        60 + 2 ** retries,
-                        "API call limit exceeded, Sleeping...",
+                        2 ** attempt, "API call limit exceeded, Sleeping..."
                     )
-                    retries += 1
                 else:
-                    raise error
+                    raise
 
     def dispatch(
         self, jobs: List[dict], max_retries: int = 10
     ) -> Dict[str, str]:
         """
-        This method uses the dictionaries in the `jobs` parameter
-        to dispatch training jobs to SageMaker using boto3.
-        Each of the dictionaries must be valid arguments to the
-        create_training_job method of boto3 which is detailed here:
+        Schedules and starts training jobs in sagemaker.
+
+        Each item in `jobs` must be valid arguments to the
+        `create_training_job` method of `boto3.sagemaker.client`:
         https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sagemaker.html#SageMaker.Client.create_training_job
 
-        The passed dictionaries are sorted into different queues
-        based on the instance the jobs should be run on.
-        Thereafter, jobs are dispatched from one of the queues while
-        instances are available on the AWS account.
-        When a 'ResourceLimitExceeded' exception is raised, this is repeated
-        for another queue until all jobs are dispatched.
-        If at any point, all resources are busy the dispatcher waits
-        for resources to become available.
+        Each job in jobs are sorted into queues based on the instance they run on.
+        `create_training_job` is then called for each item in a queue
+        until no more instances are available in sagemaker. This then repeats
+        for another queue until all queues are empty. If all resources are busy
+        for all queues, the dispatcher sleeps until resources are available.
         """
         queues = self.group_by_instance_type(jobs)
         num_remaining = len(jobs)

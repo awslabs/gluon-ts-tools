@@ -1,6 +1,6 @@
 from unittest.mock import patch, Mock
 import botocore
-from runtool.dispatcher import JobsDispatcher
+from runtool.dispatcher import JobDispatcher
 import json
 from pathlib import Path
 import pytest
@@ -28,7 +28,7 @@ def load_file(name):
 
 
 def test_group_by_instance():
-    dispatcher = JobsDispatcher(None)
+    dispatcher = JobDispatcher(None)
     job = lambda instance, name: {
         "ResourceConfig": {"InstanceType": instance},
         "name": name,
@@ -86,12 +86,12 @@ def client_side_effects(behaviour: list):
 def run_dispatch(responses, file_name, expected=None):
     client = Mock()
     client.create_training_job.side_effect = client_side_effects(responses)
-    dispatcher = JobsDispatcher(client)
+    dispatcher = JobDispatcher(client)
     assert dispatcher.dispatch(load_file(file_name)) == expected
     return client
 
 
-@patch.object(JobsDispatcher, "timeout_with_printer")
+@patch.object(JobDispatcher, "timeout_with_printer")
 @patch("time.sleep", return_value=None)
 def test_dispatch_success(patched_sleep, mock_timeout_with_printer):
     client = run_dispatch(
@@ -106,7 +106,7 @@ def test_dispatch_success(patched_sleep, mock_timeout_with_printer):
     assert mock_timeout_with_printer.call_count == 0
 
 
-@patch.object(JobsDispatcher, "timeout_with_printer")
+@patch.object(JobDispatcher, "timeout_with_printer")
 @patch("time.sleep", return_value=None)
 def test_dispatch_resources_busy_and_throttled(
     patched_sleep, mock_timeout_with_printer
@@ -123,7 +123,7 @@ def test_dispatch_resources_busy_and_throttled(
     assert mock_timeout_with_printer.call_count == 2
 
 
-@patch.object(JobsDispatcher, "timeout_with_printer")
+@patch.object(JobDispatcher, "timeout_with_printer")
 @patch("time.sleep", return_value=None)
 def test_dispatch_retry_limit_reached(
     patched_sleep, mock_timeout_with_printer

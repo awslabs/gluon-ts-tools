@@ -17,7 +17,7 @@ from runtool.datatypes import (
     Experiment,
     Experiments,
 )
-from runtool.dispatcher import JobsDispatcher
+from runtool.dispatcher import JobDispatcher
 from runtool.experiments_converter import generate_sagemaker_json
 from runtool.recurse_config import Versions
 from runtool.transformer import apply_transformations
@@ -25,8 +25,7 @@ from runtool.transformer import apply_transformations
 
 class Client:
     """
-    The Client class is the interface a user uses
-    in order to start training jobs on SageMaker.
+    The Client executes Experiments as training jobs on SageMaker.
     """
 
     def __init__(
@@ -35,7 +34,7 @@ class Client:
         self.role = role
         self.bucket = bucket
         self.session = session
-        self.dispatcher = JobsDispatcher(session.client("sagemaker"))
+        self.dispatcher = JobDispatcher(session.client("sagemaker"))
 
     def run(
         self,
@@ -46,8 +45,7 @@ class Client:
         tags: dict = {},
     ) -> Dict[str, str]:
         """
-        This method takes an Experiment or a Experiments object and
-        executes these on SageMaker.
+        Execute an Experiment or a Experiments object on SageMaker.
 
         Parameters
         ----------
