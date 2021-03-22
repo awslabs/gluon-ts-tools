@@ -1,0 +1,39 @@
+# This file showcases how one can use some of the more advanced features of the runtool
+# Examples of $each, $job_name, $eval, $trial and $ref can be seen.
+
+DeepARPlus:
+    $job_name: 
+        $eval: "f\"schjaspe-deepar-{$trial.dataset.name}-{$trial.algorithm.name}-{uid}\""
+    name: DeepARPlus
+    image:
+        $each:
+            - gluonts_cpu:v0.6.4
+            - my_image:my_tag
+    hyperparameters:
+        epochs: 1
+        early_stopping_patience: 10
+        mini_batch_size: 128
+        freq:
+            $eval: $trial.dataset.meta.freq
+        num_batches_per_epoch:
+            $eval: max(10, min($trial.dataset.meta.num_time_series / $trial.algorithm.hyperparameters.mini_batch_size, 100))
+        prediction_length:
+            $eval: 2 * $trial.dataset.meta.prediction_length
+        context_length:
+            $eval: 2 * $trial.algorithm.hyperparameters.prediction_length
+        forecaster_name: gluonts.model.deepar.DeepAREstimator    
+    instance: ml.m5.4xlarge 
+
+
+datasets:
+    - 
+        name: electricity
+        meta:
+            freq: H
+            prediction_length: 24
+            num_time_series: 9013
+        path:
+            train: s3://gluonts-run-tool/gluon_ts_datasets/electricity/train/data.json
+            test: s3://gluonts-run-tool/gluon_ts_datasets/electricity/test/data.json
+algorithms:
+    - $ref: DeepARPlus
