@@ -1,15 +1,47 @@
 import time
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, NamedTuple, NewType, Optional
 import botocore
 from toolz.itertoolz import groupby
 from itertools import count
+import boto3
+
+Job = NewType("Job", dict)
 
 
-class JobDispatcher:
-    """The JobDispatcher class starts training jobs in SageMaker."""
+def group_by_instance_type(jobs: Iterable[Job]) -> List[Job]:
+    """
+    Group job jsons into different queues depending on which instance each job
+    should be run. This returns a list of the different queues.
 
-    def __init__(self, sagemaker: botocore.client):
-        self.sagemaker = sagemaker
+    >>> result = group_by_instance_type(
+    ...     [
+    ...         {"ResourceConfig": {"InstanceType": 1}, "name": 1},
+    ...         {"ResourceConfig": {"InstanceType": 2}, "name": 2},
+    ...         {"ResourceConfig": {"InstanceType": 2}, "name": 3},
+    ...     ]
+    ... )
+    >>> result == [
+    ...     [
+    ...         {"ResourceConfig": {"InstanceType": 1}, "name": 1}
+    ...     ],
+    ...     [
+    ...         {"ResourceConfig": {"InstanceType": 2}, "name": 2},
+    ...         {"ResourceConfig": {"InstanceType": 2}, "name": 3},
+    ...     ],
+    ... ]
+    True
+    """
+    return list(
+        groupby(
+            lambda job: job["ResourceConfig"]["InstanceType"], jobs
+        ).values()
+    )
+
+
+class JobDispatcher(NamedTuple):
+    """The JobDispatcher starts training jobs in SageMaker."""
+
+    sagemaker: boto3.client
 
     def timeout_with_printer(self, timeout, message="") -> None:
         """
@@ -24,51 +56,27 @@ class JobDispatcher:
 
         print("\r", end="")
 
-    def group_by_instance_type(self, jobs: Iterable[dict]) -> List[Iterable]:
+    def start_training_job(self, job: Job, max_retries: int) -> Optional[dict]:
         """
-        This method groups all the jobs into different queues depending
-        on which instance each job should be run.
-        This returns a list of the different queues.
+        Start a training job in SageMaker, if throttled, sleep and try again.
 
-        >>> result =group_by_instance_type(
-        ...     [
-        ...         {"ResourceConfig": {"InstanceType": 1}, "name": 1},
-        ...         {"ResourceConfig": {"InstanceType": 2}, "name": 2},
-        ...         {"ResourceConfig": {"InstanceType": 2}, "name": 3},
-        ...     ]
-        ... )
-        >>> result == [
-        ...     [
-        ...         {"ResourceConfig": {"InstanceType": 1}, "name": 1}
-        ...     ],
-        ...     [
-        ...         {"ResourceConfig": {"InstanceType": 2}, "name": 2},
-        ...         {"ResourceConfig": {"InstanceType": 2}, "name": 3},
-        ...     ],
-        ... ]
-        True
-        """
-        return list(
-            groupby(
-                lambda job: job["ResourceConfig"]["InstanceType"], jobs
-            ).values()
-        )
-
-    def start_training_job(self, job: dict, max_retries: int) -> dict:
-        """
-        Start a training job in SageMaker, if throttled, sleep before trying again.
-
-        Returns the response from SageMaker or `{}` if no resources remain.
+        Returns the response from SageMaker or `None` if no resources remain.
+        Returning `None` instead of waiting for the resources to be released
+        allows the caller to the `start_training_job` to start other jobs on
+        other instance types instead of waiting for resources to be freed.
+        This improves parallelism and can greatly improve speedup depending on
+        which instance types are used.
         """
         for attempt in count(start=1):
             try:
-                response = self.sagemaker.create_training_job(**job)
-                return response
+                return self.sagemaker.create_training_job(**job)
             except botocore.exceptions.ClientError as error:
-                if error.response["Error"]["Code"] == "ResourceLimitExceeded":
-                    return {}
-                elif (
-                    error.response["Error"]["Code"] == "ThrottlingException"
+                failure_reason = error.response["Error"]["Code"]
+
+                if failure_reason == "ResourceLimitExceeded":
+                    return None
+                if (
+                    failure_reason == "ThrottlingException"
                     and attempt < max_retries
                 ):
                     # exponential backoff as recommended by AWS
@@ -79,7 +87,7 @@ class JobDispatcher:
                     raise
 
     def dispatch(
-        self, jobs: List[dict], max_retries: int = 10
+        self, jobs: List[Job], max_retries: int = 10
     ) -> Dict[str, str]:
         """
         Schedules and starts training jobs in sagemaker.
@@ -88,29 +96,30 @@ class JobDispatcher:
         `create_training_job` method of `boto3.sagemaker.client`:
         https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sagemaker.html#SageMaker.Client.create_training_job
 
-        Each job in jobs are sorted into queues based on the instance they run on.
-        `create_training_job` is then called for each item in a queue
-        until no more instances are available in sagemaker. This then repeats
-        for another queue until all queues are empty. If all resources are busy
+        Each job in jobs are sorted into queues based on the instance they run
+        on.`create_training_job` is then called for each item in a queue until
+        no more instances are available in sagemaker. This then repeats for
+        another queue until all queues are empty. If all resources are busy
         for all queues, the dispatcher sleeps until resources are available.
         """
-        queues = self.group_by_instance_type(jobs)
+        queues = group_by_instance_type(jobs)
         num_remaining = len(jobs)
         responses = {}
 
         # overwrites the current line in the terminal
         # \033[K deletes the remaining characters of the line
-        log = lambda message, end="\r": print(
-            f"\033[K{len(jobs)-num_remaining}/{len(jobs)} jobs submitted, {message}",
-            end=end,
-        )
+        def log(message, end="\r"):
+            print(
+                f"\033[K{len(jobs)-num_remaining}/{len(jobs)} jobs submitted, {message}",
+                end=end,
+            )
 
         print(f"total jobs to run: {num_remaining}")
-        while num_remaining:
+        while True:
             for queue in queues:
                 while queue:
                     run = queue.pop()
-                    log("submitting job: {}".format(run["TrainingJobName"]))
+                    log(f"submitting job: {run['TrainingJobName']}")
                     response = self.start_training_job(run, max_retries)
 
                     if response:
@@ -120,7 +129,7 @@ class JobDispatcher:
                         queue.append(run)
                         break
 
-            if num_remaining:
+            if any(queues):
                 self.timeout_with_printer(
                     60,
                     (
@@ -128,5 +137,7 @@ class JobDispatcher:
                         " Instance limit reached, pausing for 60 seconds"
                     ),
                 )
+            else:
+                break
         log("Done!", "\n")
         return responses

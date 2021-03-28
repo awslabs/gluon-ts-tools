@@ -1,6 +1,6 @@
 from unittest.mock import patch, Mock
 import botocore
-from runtool.dispatcher import JobDispatcher
+from runtool.dispatcher import JobDispatcher, group_by_instance_type
 import json
 from pathlib import Path
 import pytest
@@ -33,9 +33,10 @@ def test_group_by_instance():
         "ResourceConfig": {"InstanceType": instance},
         "name": name,
     }
-    assert dispatcher.group_by_instance_type(
-        [job(1, 1), job(2, 2), job(2, 3)]
-    ) == [[job(1, 1)], [job(2, 2), job(2, 3)]]
+    assert group_by_instance_type([job(1, 1), job(2, 2), job(2, 3)]) == [
+        [job(1, 1)],
+        [job(2, 2), job(2, 3)],
+    ]
 
 
 def client_side_effects(behaviour: list):
