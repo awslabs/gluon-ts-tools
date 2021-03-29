@@ -111,7 +111,7 @@ class RxValue(BaseModel):
 
 
 class MetaField(BaseModel):
-    rx: Optional[GroupPattern]
+    rx: GroupPattern
     name: Optional[str]
     type: Type = Type.str
 
@@ -120,6 +120,10 @@ class MetaField(BaseModel):
 
         if value is not None:
             return self.type.eval(value)
+
+
+class MetaData(BaseModel):
+    data: dict
 
 
 Name = Union[str, RxName]
@@ -136,7 +140,6 @@ class Entry(BaseModel):
     rule: str
     name: str
     value: Any
-    # group: Optional[str]
     meta: Dict = {}
 
 
@@ -145,7 +148,7 @@ class Rule(BaseModel):
     name: Name
     value: RxValue
     aggr: Aggregation = Aggregation.id
-    meta: Dict[str, Union[str, MetaField]] = {}
+    meta: Dict[str, Union[str, MetaField, MetaData]] = {}
 
     def apply(self, message):
         name = get_name(self.name, message)
@@ -162,6 +165,8 @@ class Rule(BaseModel):
 
     def get_meta(self, message):
         return valmap(
-            lambda meta: meta.apply(message) if isinstance(meta, MetaField) else meta,
+            lambda meta: meta.apply(message)
+            if isinstance(meta, MetaField)
+            else meta,
             self.meta,
         )
