@@ -27,7 +27,6 @@ rulebook = RuleBook(
             aggr="min",
             value={"rx": r"'epoch_loss'=(.+)", "type": "float"},
             meta={
-                # "x": {"rx": r"Epoch\[(\d+)\]", "type": "int", "name": "epoch"},
                 "x": "enumerate",
                 "x_name": "epoch",
                 "x_options": {"data": {"foo": 42}},
@@ -40,7 +39,25 @@ rulebook = RuleBook(
 def test_rulebook():
     report = rulebook.apply_all(lines)
 
-    # print(report.aggregated())
+    # assert report[0]["learning_rate"]
+
+    assert report.aggregated() == {
+        "learning_rate": 0.001,
+        "epoch_loss": 5.416297,
+    }
 
     plots = list(get_plot_data(report))
-    print(plots)
+    assert plots == [
+        {
+            "name": "learning_rate",
+            "x": [2, 3, 4],
+            "y": [0.001, 0.001, 0.001],
+            "options": None,
+        },
+        {
+            "name": "epoch_loss",
+            "x": [0, 1],
+            "y": [5.566774, 5.416297],
+            "options": {"foo": 42},
+        },
+    ]

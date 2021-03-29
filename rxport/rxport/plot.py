@@ -20,9 +20,13 @@ def get_plot_data(report):
             else:
                 x = [entry.meta["x"] for entry in group]
 
+            options = meta.get("x_options")
+            if options:
+                options = options.data
+
             yield {
                 "name": groupname,
                 "x": x,
                 "y": y,
-                "options": meta.get("x_options"),
+                "options": options,
             }
