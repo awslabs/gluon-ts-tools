@@ -79,9 +79,9 @@ def fix(roots: List[str]) -> None:
 
         with file_path.open("w") as out_file:
             print(f"Prepending missing header to {file_path}")
-            file.write(license)
-            file.write("\n\n")
-            file.write(file_content)
+            out_file.write(license)
+            out_file.write("\n\n")
+            out_file.write(file_content)
 
 
 @cli.command()
