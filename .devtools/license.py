@@ -57,17 +57,17 @@ def check_file(path: Path) -> bool:
     return license in head
 
 
-@click.group()
-def cli() -> None:
-    pass
-
-
 def iter_paths(roots: List[str]) -> Iterator[Path]:
     for root in map(Path, roots):
         if root.is_file():
             yield root
         else:
             yield from root.glob("**/*.py")
+
+
+@click.group()
+def cli() -> None:
+    pass
 
 
 @cli.command()
