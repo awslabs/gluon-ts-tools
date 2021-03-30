@@ -4,15 +4,14 @@ from functools import partial, singledispatch
 from hashlib import sha1
 from itertools import chain
 from typing import Any, Dict, Iterable, List, Optional, Union
-from collections import defaultdict
-from pydantic import BaseModel
-from toolz.dicttoolz import update_in
+
+from pydantic import BaseModel, validator
+from toolz.dicttoolz import update_in, valmap
 
 from runtool.datatypes import DotDict, Experiment, Experiments
 from runtool.recurse_config import recursive_apply
 from runtool.transformations import apply_trial
 from runtool.utils import update_nested_dict
-from toolz.dicttoolz import valmap
 
 
 class Job(BaseModel):
@@ -30,13 +29,14 @@ class Job(BaseModel):
     bucket: str
     role: str
     job_name_expression: Optional[str]
-    run_configuration: Optional[str]
+    run_configuration: str = None
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.run_configuration = self.generate_run_configuration()
+    @validator("run_configuration", always=True)
+    def set_run_configuration(cls: "Job", _: str, values: dict):
+        return cls.generate_run_configuration(values)
 
-    def generate_run_configuration(self) -> str:
+    @classmethod
+    def generate_run_configuration(cls: "Job", job: dict) -> str:
         """
         The run configuration describes the dataset and algorithm of the job.
 
@@ -46,7 +46,7 @@ class Job(BaseModel):
         "<experiment_name>_<hash>"
 
         """
-        hyperparameters = self.experiment["algorithm"].get(
+        hyperparameters = job["experiment"]["algorithm"].get(
             "hyperparameters", ""
         )
         if hyperparameters:
@@ -54,13 +54,13 @@ class Job(BaseModel):
 
         trial_id = "".join(
             (
-                self.experiment["algorithm"]["image"],
-                self.experiment["algorithm"]["instance"],
+                job["experiment"]["algorithm"]["image"],
+                job["experiment"]["algorithm"]["instance"],
                 hyperparameters,
-                json.dumps(self.experiment["dataset"], sort_keys=True),
+                json.dumps(job["experiment"]["dataset"], sort_keys=True),
             )
         )
-        return f"{self.experiment_name}_{reproducible_hash(trial_id)}"
+        return f"{job['experiment_name']}_{reproducible_hash(trial_id)}"
 
     def generate_tags(self) -> List[Dict[str, str]]:
         """
@@ -231,6 +231,18 @@ class Job(BaseModel):
 
 
 def reproducible_hash(data):
+    """
+    Generate a hash which is reproducible across several runs of Python.
+
+    The builtin `hash` method of Python generates different hashes during
+    different runs of Python while the `reproducible_hash`always generates
+    the same value.
+
+    >>> reproducible_hash("hello")
+    f7ff9e8b
+    >>> reproducible_hash({"foo": 1})
+    0c90a67c
+    """
     return str(sha1(str(data).encode("UTF-8")).hexdigest()[:8])
 
 

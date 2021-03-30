@@ -1,17 +1,20 @@
 import time
+from itertools import count
 from typing import Dict, Iterable, List, NamedTuple, NewType, Optional
+
+import boto3
 import botocore
 from toolz.itertoolz import groupby
-from itertools import count
-import boto3
 
-Job = NewType("Job", dict)
+JobConfiguration = NewType("JobConfiguration", dict)
 
 
-def group_by_instance_type(jobs: Iterable[Job]) -> List[Job]:
+def group_by_instance_type(
+    jobs: Iterable[JobConfiguration],
+) -> List[List[JobConfiguration]]:
     """
-    Group job jsons into different queues depending on which instance each job
-    should be run. This returns a list of the different queues.
+    Group job-configuration into different queues depending on which instance
+    each job should be run. This returns a list of the different queues.
 
     >>> result = group_by_instance_type(
     ...     [
@@ -33,7 +36,8 @@ def group_by_instance_type(jobs: Iterable[Job]) -> List[Job]:
     """
     return list(
         groupby(
-            lambda job: job["ResourceConfig"]["InstanceType"], jobs
+            lambda job_config: job_config["ResourceConfig"]["InstanceType"],
+            jobs,
         ).values()
     )
 
@@ -56,7 +60,9 @@ class JobDispatcher(NamedTuple):
 
         print("\r", end="")
 
-    def start_training_job(self, job: Job, max_retries: int) -> Optional[dict]:
+    def start_training_job(
+        self, job: JobConfiguration, max_retries: int
+    ) -> Optional[dict]:
         """
         Start a training job in SageMaker, if throttled, sleep and try again.
 
@@ -75,6 +81,7 @@ class JobDispatcher(NamedTuple):
 
                 if failure_reason == "ResourceLimitExceeded":
                     return None
+
                 if (
                     failure_reason == "ThrottlingException"
                     and attempt < max_retries
@@ -87,10 +94,10 @@ class JobDispatcher(NamedTuple):
                     raise
 
     def dispatch(
-        self, jobs: List[Job], max_retries: int = 10
+        self, jobs: List[JobConfiguration], max_retries: int = 10
     ) -> Dict[str, str]:
         """
-        Schedules and starts training jobs in sagemaker.
+        Schedule and start training jobs in sagemaker.
 
         Each item in `jobs` must be valid arguments to the
         `create_training_job` method of `boto3.sagemaker.client`:
@@ -103,18 +110,17 @@ class JobDispatcher(NamedTuple):
         for all queues, the dispatcher sleeps until resources are available.
         """
         queues = group_by_instance_type(jobs)
-        num_remaining = len(jobs)
         responses = {}
 
-        # overwrites the current line in the terminal
-        # \033[K deletes the remaining characters of the line
         def log(message, end="\r"):
+            """Overwrite previous line in the terminal with `message`"""
+            # \033[K deletes the remaining characters of the line
             print(
-                f"\033[K{len(jobs)-num_remaining}/{len(jobs)} jobs submitted, {message}",
+                f"\033[K{len(responses)}/{len(jobs)} jobs submitted, {message}",
                 end=end,
             )
 
-        print(f"total jobs to run: {num_remaining}")
+        print(f"total jobs to run: {len(jobs)}")
         while True:
             for queue in queues:
                 while queue:
@@ -124,7 +130,6 @@ class JobDispatcher(NamedTuple):
 
                     if response:
                         responses[run["TrainingJobName"]] = response
-                        num_remaining -= 1
                     else:
                         queue.append(run)
                         break
@@ -133,7 +138,7 @@ class JobDispatcher(NamedTuple):
                 self.timeout_with_printer(
                     60,
                     (
-                        f"\r{len(jobs) - num_remaining}/{len(jobs)} jobs submitted."
+                        f"\r{len(responses)}/{len(jobs)} jobs submitted."
                         " Instance limit reached, pausing for 60 seconds"
                     ),
                 )
