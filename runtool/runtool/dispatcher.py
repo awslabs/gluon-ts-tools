@@ -29,23 +29,22 @@ def group_by_instance_type(
     Group job-configuration into different queues depending on which instance
     each job should be run. This returns a list of the different queues.
 
-    >>> result = group_by_instance_type(
+    >>> group_by_instance_type( # doctest: +SKIP
     ...     [
     ...         {"ResourceConfig": {"InstanceType": 1}, "name": 1},
     ...         {"ResourceConfig": {"InstanceType": 2}, "name": 2},
     ...         {"ResourceConfig": {"InstanceType": 2}, "name": 3},
     ...     ]
     ... )
-    >>> result == [
-    ...     [
-    ...         {"ResourceConfig": {"InstanceType": 1}, "name": 1}
-    ...     ],
-    ...     [
-    ...         {"ResourceConfig": {"InstanceType": 2}, "name": 2},
-    ...         {"ResourceConfig": {"InstanceType": 2}, "name": 3},
-    ...     ],
-    ... ]
-    True
+    [
+        [
+            {"ResourceConfig": {"InstanceType": 1}, "name": 1}
+        ],
+        [
+            {"ResourceConfig": {"InstanceType": 2}, "name": 2},
+            {"ResourceConfig": {"InstanceType": 2}, "name": 3},
+        ],
+    ]
     """
     return list(
         groupby(

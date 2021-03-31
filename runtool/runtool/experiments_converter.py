@@ -13,7 +13,7 @@
 
 import json
 from datetime import datetime
-from functools import partial, singledispatch
+from functools import partial
 from hashlib import sha1
 from itertools import chain
 from typing import Any, Dict, Iterable, List, Optional, Union
@@ -304,7 +304,6 @@ def generate_job_json(job: Job) -> Iterable[dict]:
         yield update_nested_dict(json_, overrides)
 
 
-@singledispatch
 def generate_sagemaker_json(
     experiment: Union[Experiment, Experiments],
     runs: int,
