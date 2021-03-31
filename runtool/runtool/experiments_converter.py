@@ -34,14 +34,13 @@ class Job(BaseModel):
     """
 
     experiment: dict
-    tags: dict
-    runs: int
-    experiment_name: str
-    tags: dict
     creation_time: str
     bucket: str
     role: str
-    job_name_expression: Optional[str]
+    tags: Optional[dict] = {}
+    runs: Optional[int] = 1
+    experiment_name: Optional[str] = None
+    job_name_expression: Optional[str] = None
     run_configuration: str = None
 
     @validator("run_configuration", always=True)
@@ -202,10 +201,15 @@ class Job(BaseModel):
 
         i.e.
 
-        >>> algorithm={$sagmaker.hello.world: 10}
-        >>> dataset={"smth": 1}
-        >>> generate_sagemaker_overrides(algorithm, dataset) == {
-        ...     "hello" {"world": 10}
+        >>> job = Job( # doctest: +SKIP
+        ...     experiment=dict(
+        ...         algorithm={"$sagemaker.hello.world": 10},
+        ...         dataset={"smth": 1}
+        ...     ),
+        ...     ...
+        ... )
+        >>> job.generate_sagemaker_overrides() == { # doctest: +SKIP
+        ...     "hello": {"world": 10},
         ... }
         True
 
@@ -252,9 +256,9 @@ def reproducible_hash(data):
     the same value.
 
     >>> reproducible_hash("hello")
-    f7ff9e8b
+    'aaf4c61d'
     >>> reproducible_hash({"foo": 1})
-    0c90a67c
+    '0c90a67c'
     """
     return str(sha1(str(data).encode("UTF-8")).hexdigest()[:8])
 
