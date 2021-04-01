@@ -1,5 +1,5 @@
 # Runtool
-The Runtool is used to generate reproducible experiments on AWS SageMaker. 
+The Runtool is a tool for running large scale experiments on AWS SageMaker. 
 
 ## Installation
 ```bash
@@ -54,5 +54,5 @@ jobs = tool.run(my_experiment)
 ## Additional materials
 
 * Step by step tutorials are available in [examples/tutorials](examples/tutorials). 
-* Walkthrough of writing `config.yml` files see [examples/writing_configs.md](examples/writing_configs.md)
-* For examples needing minimum configuration see [examples/runnable_examples](examples/runnable_examples)
+* For a walkthrough of writing `config.yml` files see [examples/writing_configs.md](examples/writing_configs.md)
+* For runnable examples see [examples/runnable_examples](examples/runnable_examples)
