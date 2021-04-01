@@ -7,32 +7,34 @@ import yaml
 from beautifultable import BeautifulTable
 
 from runtool.utils import get_item_from_path
+from runtool.dispatcher import JobConfiguration
 
 
 def generate_dry_run_table(
-    jobs: List[dict], print_data: bool = True
+    jobs: List[JobConfiguration], print_data: bool = True
 ) -> pandas.DataFrame:
     """
-    Print a dry run table summarizing the jobs.
+    Generate a dry run table summarizing the jobs and optionally print it.
 
     Returns
     -------
     pandas.DataFrame
         The table as a pandas dataframe
     """
-    paths = {
-        "image": "AlgorithmSpecification.TrainingImage",
-        "hyperparameters": "HyperParameters",
-        "output_path": "OutputDataConfig.S3OutputPath",
-        "instance": "ResourceConfig.InstanceType",
-        "job_name": "TrainingJobName",
-    }
+    paths = dict(
+        image="AlgorithmSpecification.TrainingImage",
+        hyperparameters="HyperParameters",
+        output_path="OutputDataConfig.S3OutputPath",
+        instance="ResourceConfig.InstanceType",
+        job_name="TrainingJobName",
+    )
 
     table_data = []
     for job_definition in jobs:
-        row = {}
-        for key, path in paths.items():
-            row[key] = get_item_from_path(job_definition, path)
+        row = {
+            key: get_item_from_path(job_definition, path)
+            for key, path in paths.items()
+        }
 
         row["tags"] = {
             tag["Key"]: tag["Value"] for tag in job_definition["Tags"]

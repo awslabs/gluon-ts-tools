@@ -34,6 +34,7 @@ from runtool.dispatcher import JobDispatcher
 from runtool.experiments_converter import generate_sagemaker_json
 from runtool.recurse_config import Versions
 from runtool.transformer import apply_transformations
+from runtool.dry_run import generate_dry_run_table
 
 
 class Client:
@@ -91,6 +92,48 @@ class Client:
             role=self.role,
         )
         return self.dispatcher.dispatch(list(json_stream))
+
+    def dry_run(
+        self,
+        experiment: Union[Experiments, Experiment],
+        experiment_name: str = "default experiment name",
+        runs: int = 1,
+        job_name_expression: str = None,
+        tags: dict = {},
+    ) -> Dict[str, str]:
+        """
+        Summarize jobs which would be created when calling `Client.run`.
+
+        Parameters
+        ----------
+        experiment
+            A `runtool.datatypes.Experiment` object
+        experiment_name
+            The name of the experiment
+        runs
+            Number of times each job should be repeated
+        job_name_expression
+            A python expression which will be used to set
+            the `TrainingJobName` field in the generated JSON.
+        tags
+            Any tags that should be set in the training job JSON
+
+        Returns
+        -------
+        Pandas.Dataframe
+            The dry run table
+        """
+        json_stream = generate_sagemaker_json(
+            experiment,
+            runs=runs,
+            experiment_name=experiment_name,
+            job_name_expression=job_name_expression,
+            tags=tags,
+            creation_time=datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S"),
+            bucket=self.bucket,
+            role=self.role,
+        )
+        return generate_dry_run_table(list(json_stream))
 
 
 @singledispatch
