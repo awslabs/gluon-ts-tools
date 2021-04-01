@@ -1,9 +1,23 @@
-from unittest.mock import patch, Mock
-import botocore
-from runtool.dispatcher import JobDispatcher
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# or in the "license" file accompanying this file. This file is distributed
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
+# permissions and limitations under the License.
+
 import json
 from pathlib import Path
+from unittest.mock import Mock, patch
+
+import botocore
 import pytest
+from runtool.dispatcher import JobDispatcher, group_by_instance_type
 
 RESPONSE = {
     "TrainingJobArn": "arn:aws:sagemaker:eu-west-1:012345678901:training-job/test-60a848663fa1",
@@ -33,9 +47,10 @@ def test_group_by_instance():
         "ResourceConfig": {"InstanceType": instance},
         "name": name,
     }
-    assert dispatcher.group_by_instance_type(
-        [job(1, 1), job(2, 2), job(2, 3)]
-    ) == [[job(1, 1)], [job(2, 2), job(2, 3)]]
+    assert group_by_instance_type([job(1, 1), job(2, 2), job(2, 3)]) == [
+        [job(1, 1)],
+        [job(2, 2), job(2, 3)],
+    ]
 
 
 def client_side_effects(behaviour: list):

@@ -1,3 +1,16 @@
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# or in the "license" file accompanying this file. This file is distributed
+# on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+# express or implied. See the License for the specific language governing
+# permissions and limitations under the License.
+
 from collections import defaultdict
 from datetime import datetime
 from functools import singledispatch
@@ -21,7 +34,6 @@ from runtool.dispatcher import JobDispatcher
 from runtool.experiments_converter import generate_sagemaker_json
 from runtool.recurse_config import Versions
 from runtool.transformer import apply_transformations
-from runtool.dry_run import generate_dry_run_table
 
 
 class Client:
@@ -79,27 +91,6 @@ class Client:
             role=self.role,
         )
         return self.dispatcher.dispatch(list(json_stream))
-
-    def dry_run(
-        self,
-        experiment: Union[Experiments, Experiment],
-        experiment_name: str = "default experiment name",
-        runs: int = 1,
-        job_name_expression: str = None,
-        tags: dict = {},
-        print_data: bool = True,
-    ):
-        json_stream = generate_sagemaker_json(
-            experiment,
-            runs=runs,
-            experiment_name=experiment_name,
-            job_name_expression=job_name_expression,
-            tags=tags,
-            creation_time=datetime.utcnow().strftime("%Y-%m-%d-%H-%M-%S"),
-            bucket=self.bucket,
-            role=self.role,
-        )
-        return generate_dry_run_table(json_stream, print_data)
 
 
 @singledispatch
