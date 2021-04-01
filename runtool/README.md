@@ -10,8 +10,8 @@ pip install -e .
 
 These two steps are required to use the runtool.
 
-2. Create a `config.yml` file which describes your algorithms and datasets
-3. Create a python script using the runtool
+1. Create a `config.yml` file which describes your algorithms and datasets
+2. Create a python script using the runtool
 
 Below is an example `config.yml`
 
