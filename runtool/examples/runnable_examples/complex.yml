@@ -3,7 +3,7 @@
 
 DeepARPlus:
     $job_name: 
-        $eval: "f\"schjaspe-deepar-{$trial.dataset.name}-{$trial.algorithm.name}-{uid}\""
+        $eval: "f\"deepar-{$trial.dataset.name}-{$trial.algorithm.name}-{uid}\""
     name: DeepARPlus
     image:
         $each:
