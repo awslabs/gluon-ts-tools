@@ -20,12 +20,14 @@ def pytest_addoption(parser):
     parser.addoption(
         "--sagetest_fixtures",
         action="store",
-        default='{"my_fixture": {"names": ["71626642--2021-05-03--05-05-50-528194--37886482-0"]}}',
+        default="{}",
         help="""Dictionary which will be added to the `cli_fixtures` fixture when tests are run. 
-        The values of the dictionary will be converted to `sagetest.Jobs` objects.
+        The values of the dictionary will be passed to a Filters object as kwargs and must thus. 
+        These filters are then used to query SageMaker.
+
         Example:
 
-        {\"my_fixture\": {\"names\": [\"71626642--2021-05-03--05-05-50-528194--37886482-0\"]}}
+        {\"my_fixture\": {\"names\": [\"my-training-job-name\"]}}
         
         Is accessable in the test file as:
 
