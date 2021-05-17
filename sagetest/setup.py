@@ -22,7 +22,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "PyYAML",
-        "pydantic",
+        "pydantic>=1.6.2",
         "toolz",
         "pytest",
         "Click",

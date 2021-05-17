@@ -15,7 +15,7 @@ from typing import Any, List, Union
 
 import pandas as pd
 import yaml
-from pydantic.main import BaseModel
+from pydantic import BaseModel
 
 
 class Job(BaseModel):
@@ -31,18 +31,20 @@ class Job(BaseModel):
         return yaml.dump(self.json)
 
     @classmethod
-    def from_json(cls, json: dict) -> "Job":
+    def from_json(cls, sagemaker_trainingjob: dict) -> "Job":
         return cls(
-            training_time=json.get("TrainingTimeInSeconds", None),
-            hyperparameters=json.get("HyperParameters", {}),
+            training_time=sagemaker_trainingjob.get("TrainingTimeInSeconds"),
+            hyperparameters=sagemaker_trainingjob.get("HyperParameters", {}),
             tags={
                 key: value
-                for tag in json.get("Tags", {})
+                for tag in sagemaker_trainingjob.get("Tags", {})
                 for key, value in tag.items()
             },
             metrics={
                 metric["MetricName"]: metric["Value"]
-                for metric in json.get("FinalMetricDataList", [])
+                for metric in sagemaker_trainingjob.get(
+                    "FinalMetricDataList", []
+                )
             },
         )
 

@@ -12,14 +12,12 @@
 # permissions and limitations under the License.
 
 import json
-
-from _pytest.mark import param
-from sagetest.jobs import Jobs
 from typing import Any, Dict, Iterable, List, Tuple, Union
 
 import boto3
 import pytest
 
+from .jobs import Jobs
 from .search import Filter, query
 
 
@@ -47,8 +45,8 @@ class SageTest:
         """Setup fixture from CLI arguments."""
 
         def fixture(pytestconfig) -> Dict[str, Jobs]:
-            """Query SageMaker using args passed from --sagetest_fixtures."""
-            filters = json.loads(pytestconfig.getoption("--sagetest_fixtures"))
+            """Query SageMaker using args passed from --sagetest-fixtures."""
+            filters = json.loads(pytestconfig.getoption("--sagetest-fixtures"))
             yield {
                 fixture_name: self.search(Filter(**filterkwargs))
                 for fixture_name, filterkwargs in filters.items()

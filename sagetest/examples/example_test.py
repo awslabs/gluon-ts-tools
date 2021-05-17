@@ -11,9 +11,10 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
-from sagetest.jobs import Jobs
-from sagetest import SageTest, Filter
 import boto3
+import pandas
+from sagetest import Filter, SageTest
+from sagetest.jobs import Job, Jobs
 
 # create a SageTest sesssion
 sagetest = SageTest(
@@ -29,11 +30,10 @@ sagetest.fixture(
 
 # Use fixture
 def test_sagetest_fixture(reference_job: Jobs):
-    print(reference_job.metrics)
-    assert 0
+    assert isinstance(reference_job.metrics, pandas.DataFrame)
 
 
-# create a pytest.mark.parametrize populated with SageMaker training jobs.
+# Decorate with pytest.mark.parametrize populated with SageMaker training jobs
 @sagetest.parametrize(
     "jobs",
     [
@@ -42,5 +42,6 @@ def test_sagetest_fixture(reference_job: Jobs):
     ],
 )
 def test_some_jobs(jobs: Jobs):
-    print("jobs", jobs.metrics)
-    assert 0
+    assert len(jobs) == 2
+    assert isinstance(jobs[0], Job)
+    assert jobs.metrics["abs_error"].mean() < 100
