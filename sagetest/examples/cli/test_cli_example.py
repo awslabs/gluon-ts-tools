@@ -18,5 +18,9 @@ sagetest = SageTest(locals(), session=boto3.Session())  # can be in conftest.py
 
 # the cli_fixtures fixture contains jobs matched by --sagetest-fixtures option
 def test_my_param(cli_fixtures):
-    print(cli_fixtures["my_fixture"].metrics)
-    assert False
+    jobs = cli_fixtures["my_jobs"]
+
+    # do some tests on the jobs
+    assert jobs.metrics["MASE"].mean() < 1
+    assert jobs.all(lambda job: job.training_time < 60)
+    assert len(jobs) == 5

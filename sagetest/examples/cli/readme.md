@@ -1,5 +1,5 @@
 # Using SageTest via the pytest cli
-One can populate fixtures in pytest with SageMaker training jobs by using the `--sagetest-fixtures` option as below.
+One can populate fixtures in pytest with SageMaker training jobs by using the `--sagetest-fixtures` option when running pytest.
 
 ```bash
 pytest <path> --sagetest-fixtures <filters>
@@ -11,30 +11,27 @@ The `<filters>` argument is a dictionary mapping a name to `sagetest.Filters` kw
 "{'<fixture_name>': '<kwargs for `sagetest.Filter`>'}"
 ```
 
-Training jobs which match the filters are then accessible via the `cli_fixtures` fixture during tests. 
+Training jobs that match the supplied filters are then accessible via the `cli_fixtures` fixture in tests. 
 
 ## Example
-An end to end example of how SageTest can be used to via the cli is shown below. Note that the below material is implemented in the current directory as well in the `conftest.py`, `run_test.sh` and the `test_example.py` files. 
+Running the below command makes jobs with the name `job-name` available for tests.
 
 ```bash
-pytest test_my_file.py --sagetest-fixtures '{"my_jobs": {"names": ["job-name"]}}'
+pytest test_cli_example.py --sagetest-fixtures '{"my_jobs": {"names": ["job-name"]}}'
 ```
 
-In the python file you wish to test, you can then request the `cli_fixtures` parameters which will include the matched training jobs.
+In the python file where your tests are defined, you can then request the `cli_fixtures` fixture which contains the matched training jobs under the key you supplied. In this case the key is `my_jobs`.
 
 ```python
 #contents of the test file
+from sagetest import SageTest
+import boto3
+
+sagetest = SageTest(locals(), session=boto3.Session())  # can be in conftest.py
+
 def my_test(cli_fixtures):
     jobs = cli_fixtures['my_jobs']
     # do some tests on the matched jobs
 ```
 
-### conftest.py
-In the conftest.py you should initialize SageTest as below. 
-
-```python
-# contents of conftest.py
-sagetest = SageTest(locals(), session=boto3.Session())
-```
-
-Initializing SageTest can also be done in the test files.
+An implementation of this example can be found in the `run_test.sh` and the `test_cli_example.py` files.
