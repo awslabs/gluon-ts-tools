@@ -12,15 +12,10 @@
 # permissions and limitations under the License.
 
 import boto3
-import pandas
 from sagetest import Filter, SageTest
-from sagetest.jobs import Job, Jobs
+from sagetest.jobs import Jobs
 
-# create a SageTest sesssion
-sagetest = SageTest(
-    locals(),
-    session=boto3.Session(),
-)
+sagetest = SageTest(locals(), boto3.Session())
 
 # Create a pytest fixture containing SageMaker training jobs
 sagetest.fixture(
@@ -30,10 +25,10 @@ sagetest.fixture(
 
 # Use fixture
 def test_sagetest_fixture(reference_job: Jobs):
-    assert isinstance(reference_job.metrics, pandas.DataFrame)
+    assert reference_job.metrics["abs_error"] < 100
 
 
-# Decorate with pytest.mark.parametrize populated with SageMaker training jobs
+# parametrize with SageMaker training jobs
 @sagetest.parametrize(
     "jobs",
     [
@@ -42,6 +37,10 @@ def test_sagetest_fixture(reference_job: Jobs):
     ],
 )
 def test_some_jobs(jobs: Jobs):
-    assert len(jobs) == 2
-    assert isinstance(jobs[0], Job)
-    assert jobs.metrics["abs_error"].mean() < 100
+    # do some tests on the matched jobs below
+    assert jobs.metrics["MASE"].mean() < 1
+    assert jobs.all(lambda job: job.training_time < 60)
+    assert len(jobs) == 1
+
+    # apply additional filtering if needed
+    subset = jobs.where(lambda job: "my_tag" in job.tags)

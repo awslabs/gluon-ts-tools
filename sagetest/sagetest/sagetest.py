@@ -13,6 +13,7 @@
 
 import json
 from typing import Any, Dict, Iterable, List, Tuple, Union
+from _pytest.fixtures import FixtureLookupError
 
 import boto3
 import pytest
@@ -28,29 +29,35 @@ class SageTest:
         self.setup_sagetest_fixture()
         self.setup_commandline_fixtures()
 
-    def setup_sagetest_fixture(self):
+    def setup_sagetest_fixture(self, name="sagetest_instance"):
         """Make `self` available as pytest fixture `sagetest_instance`."""
 
-        def sagetest_instance_fixture():
+        def sagetest_instance_fixture(request):
             yield self
 
-        self.locals["sagetest_instance"] = pytest.fixture(
-            name="sagetest_instance",
+        self.locals[name] = pytest.fixture(
+            name=name,
             fixture_function=sagetest_instance_fixture,
             scope="session",
             autouse=True,
         )
 
-    def setup_commandline_fixtures(self):
+    def setup_commandline_fixtures(self, name="cli_fixtures"):
         """Setup fixture from CLI arguments."""
 
-        def fixture(pytestconfig) -> Dict[str, Jobs]:
+        def fixture(pytestconfig, request) -> Dict[str, Jobs]:
             """Query SageMaker using args passed from --sagetest-fixtures."""
-            filters = json.loads(pytestconfig.getoption("--sagetest-fixtures"))
-            yield {
-                fixture_name: self.search(Filter(**filterkwargs))
-                for fixture_name, filterkwargs in filters.items()
-            }
+
+            try:
+                yield request.getfixturevalue(name)  # reuse if fixture exists
+            except FixtureLookupError:
+                filters = json.loads(
+                    pytestconfig.getoption("--sagetest-fixtures")
+                )
+                yield {
+                    fixture_name: self.search(Filter(**filterkwargs))
+                    for fixture_name, filterkwargs in filters.items()
+                }
 
         self.locals["cli_fixtures"] = pytest.fixture(
             name="cli_fixtures",

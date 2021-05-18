@@ -11,7 +11,7 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
-from typing import Any, List, Union
+from typing import Any, Callable, List, Union
 
 import pandas as pd
 import yaml
@@ -62,6 +62,16 @@ class Jobs:
     def update_metrics_dataframe(self) -> None:
         self.metrics = pd.DataFrame((job.metrics for job in self.data))
 
+    def where(self, func: Callable) -> "Jobs":
+        """Extract jobs where func evaluates to True"""
+        return [filter(func, self.data)]
+
+    def all(self, func: Callable) -> any:
+        return all(map(func, self.data))
+
+    def __bool__(self) -> bool:
+        return bool(self.data)
+
     def __len__(self) -> int:
         return len(self.data)
 
@@ -69,6 +79,9 @@ class Jobs:
         if isinstance(key, slice):
             return Jobs(self.data[key])
         return self.data[key]
+
+    def __iter__(self):
+        return iter(self.data)
 
     @classmethod
     def from_json_list(cls, sm_jsons: List[dict]) -> "Jobs":
