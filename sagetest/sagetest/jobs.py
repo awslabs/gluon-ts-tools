@@ -64,7 +64,7 @@ class Jobs:
 
     def where(self, func: Callable) -> "Jobs":
         """Extract jobs where func evaluates to True"""
-        return [filter(func, self.data)]
+        return list(filter(func, self.data))
 
     def all(self, func: Callable) -> any:
         return all(map(func, self.data))

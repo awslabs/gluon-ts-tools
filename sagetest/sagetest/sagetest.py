@@ -12,7 +12,7 @@
 # permissions and limitations under the License.
 
 import json
-from typing import Any, Dict, Iterable, List, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
 from _pytest.fixtures import FixtureLookupError
 
 import boto3
@@ -23,26 +23,21 @@ from .search import Filter, query
 
 
 class SageTest:
-    def __init__(self, _locals, session=boto3.Session()) -> None:
-        self.locals = _locals
+    def __init__(self, session=boto3.Session()) -> None:
         self.session = session
-        self.setup_sagetest_fixture()
-        self.setup_commandline_fixtures()
 
-    def setup_sagetest_fixture(self, name="sagetest_instance"):
-        """Make `self` available as pytest fixture `sagetest_instance`."""
-
-        def sagetest_instance_fixture(request):
+    def init_fixture(self, name="sagetest_instance"):
+        def func():
             yield self
 
-        self.locals[name] = pytest.fixture(
-            name=name,
-            fixture_function=sagetest_instance_fixture,
+        return pytest.fixture(
             scope="session",
             autouse=True,
+            name=name,
+            fixture_function=func,
         )
 
-    def setup_commandline_fixtures(self, name="cli_fixtures"):
+    def init_cli(self, name="cli_fixtures"):
         """Setup fixture from CLI arguments."""
 
         def fixture(pytestconfig, request) -> Dict[str, Jobs]:
@@ -59,7 +54,7 @@ class SageTest:
                     for fixture_name, filterkwargs in filters.items()
                 }
 
-        self.locals["cli_fixtures"] = pytest.fixture(
+        return pytest.fixture(
             name="cli_fixtures",
             fixture_function=fixture,
             scope="session",
@@ -74,20 +69,17 @@ class SageTest:
             return query(filters, self.session)
         return [query(_filter, self.session) for _filter in filters]
 
-    def fixture(
-        self,
-        fixture_name: str,
-        filters: Union[List[Filter], Filter],
-        scope: str = "session",
-    ) -> List[Jobs]:
+    def fixture(self, *args, **kwargs) -> Callable:
         """Create a pytest fixture where filters are transformed to `sagetest.Jobs`."""
 
-        def fixture_function():
-            yield self.search(filters)
+        def decorator(func):
+            @pytest.fixture(name=func.__name__, *args, **kwargs)
+            def wrapper():
+                yield self.search(func())
 
-        self.locals[fixture_name] = pytest.fixture(
-            name=fixture_name, fixture_function=fixture_function, scope=scope
-        )
+            return wrapper
+
+        return decorator
 
     def parametrize(
         self,

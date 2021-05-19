@@ -14,13 +14,13 @@
 from sagetest import SageTest
 import boto3
 
-sagetest = SageTest(locals(), session=boto3.Session())  # can be in conftest.py
+sagetest = SageTest(session=boto3.Session())  # can be in conftest.py
 
 # the cli_fixtures fixture contains jobs matched by --sagetest-fixtures option
 def test_my_param(cli_fixtures):
     jobs = cli_fixtures["my_jobs"]
 
-    # do some tests on the jobs
+    # do some tests on the matched jobs below
     assert jobs.metrics["MASE"].mean() < 1
     assert jobs.all(lambda job: job.training_time < 60)
     assert len(jobs) == 5

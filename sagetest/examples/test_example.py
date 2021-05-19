@@ -15,25 +15,25 @@ import boto3
 from sagetest import Filter, SageTest
 from sagetest.jobs import Jobs
 
-sagetest = SageTest(locals(), boto3.Session())
+sagetest = SageTest(boto3.Session())
 
-# Create a pytest fixture containing SageMaker training jobs
-sagetest.fixture(
-    fixture_name="reference_job",
-    filters=Filter(names=["a training job name"]),
-)
+
+@sagetest.fixture()  # parameters passed to @pytest.fixture decorator
+def reference_job():
+    return Filter(names=["<a training job name>"])
+
 
 # Use fixture
 def test_sagetest_fixture(reference_job: Jobs):
-    assert reference_job.metrics["abs_error"] < 100
+    assert reference_job.metrics["abs_error"].mean() < 100
 
 
 # parametrize with SageMaker training jobs
 @sagetest.parametrize(
     "jobs",
     [
-        Filter(names=["some job name"]),
-        Filter(names=["another job name"]),
+        Filter(names=["<some job name>"]),
+        Filter(names=["<another job name>"]),
     ],
 )
 def test_some_jobs(jobs: Jobs):
@@ -43,4 +43,4 @@ def test_some_jobs(jobs: Jobs):
     assert len(jobs) == 1
 
     # apply additional filtering if needed
-    subset = jobs.where(lambda job: "my_tag" in job.tags)
+    subset = jobs.where(lambda job: "<my_tag>" in job.tags)
