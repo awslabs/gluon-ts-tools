@@ -11,7 +11,7 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 
-from typing import Any, Callable, List, Union
+from typing import Any, Callable, List, Optional, Union
 
 import pandas as pd
 import yaml
@@ -20,9 +20,10 @@ from pydantic import BaseModel
 
 class Job(BaseModel):
     metrics: dict
-    training_time: int
+    training_time: Optional[int]
     hyperparameters: dict
     tags: dict
+    source: dict
 
     def __getitem__(self, key: Any) -> Any:
         return self.json[key]
@@ -46,6 +47,7 @@ class Job(BaseModel):
                     "FinalMetricDataList", []
                 )
             },
+            source=sagemaker_trainingjob,
         )
 
 

@@ -12,6 +12,7 @@
 # permissions and limitations under the License.
 
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel
 
@@ -19,8 +20,8 @@ from .jobs import Jobs
 
 
 class Filter(BaseModel):
-    expression: str = None
     algorithm: str = None
+    image: str = None
     hyperparameters: dict = None
     dataset: str = None
     tags: dict = None
@@ -28,7 +29,7 @@ class Filter(BaseModel):
     end_time: datetime = None
     names: list = None
     status: list = None
-    search_filters: list = None
+    search_filters: List[dict] = []
     max_results: int = 100
 
     def convert_to_sagemaker(self):
@@ -36,12 +37,11 @@ class Filter(BaseModel):
 
         def add_filter(name, value, operator="Equals"):
             sm_filters.append(
-                {
-                    "Name": name,
-                    "Operator": operator,
-                    "Value": value,
-                }
+                {"Name": name, "Operator": operator, "Value": str(value)}
             )
+
+        def convert_time(time: datetime):
+            return time.strftime("%Y-%m-%dT%H:%M:%SZ")
 
         if self.tags:
             for key, val in self.tags.items():
@@ -49,20 +49,17 @@ class Filter(BaseModel):
 
         if self.hyperparameters:
             for key, val in self.hyperparameters.items():
-                add_filter(f"HyperParameters.{key}", str(val))
+                add_filter(f"HyperParameters.{key}", val)
 
         if self.algorithm:
-            add_filter(
-                "AlgorithmSpecification.AlgorithmName"
-                if self.algorithm.startswith("arn:aws")
-                else "AlgorithmSpecification.TrainingImage",
-                self.algorithm,
-            )
+            add_filter("AlgorithmSpecification.AlgorithmName", self.algorithm)
+
+        if self.image:
+            add_filter("AlgorithmSpecification.TrainingImage", self.image)
 
         if self.dataset:
             add_filter(
-                "InputDataConfig.DataSource.S3DataSource.S3Uri",
-                self.dataset,
+                "InputDataConfig.DataSource.S3DataSource.S3Uri", self.dataset
             )
 
         if self.names:
@@ -73,10 +70,13 @@ class Filter(BaseModel):
                 "TrainingJobStatus", ",".join(self.status), operator="In"
             )
 
-        if self.search_filters:
-            sm_filters += self.search_filters
+        if self.start_time:
+            add_filter("TrainingStartTime", convert_time(self.start_time))
 
-        return sm_filters
+        if self.end_time:
+            add_filter("TrainingEndTime", convert_time(self.end_time))
+
+        return sm_filters + self.search_filters
 
 
 def query(job_filter: Filter, session):
