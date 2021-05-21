@@ -19,7 +19,7 @@ from sagetest.search import Filter
 
 
 def search_sideffect(filters):
-    job = Job(metrics={}, training_time=100, hyperparameters={}, tags={})
+    job = Job(name="")
     return Jobs([job] * len(filters.names))
 
 
