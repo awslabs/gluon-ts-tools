@@ -27,7 +27,8 @@ In the python file where your tests are defined, you can then request the `cli_f
 from sagetest import SageTest
 import boto3
 
-sagetest = SageTest(locals(), session=boto3.Session())  # can be in conftest.py
+sagetest = SageTest(boto3.Session())  # can be in conftest.py
+cli = sagetest.init_cli()
 
 def my_test(cli_fixtures):
     jobs = cli_fixtures['my_jobs']
