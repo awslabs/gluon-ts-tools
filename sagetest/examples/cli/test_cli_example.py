@@ -15,9 +15,9 @@ from sagetest import SageTest
 import boto3
 
 sagetest = SageTest(session=boto3.Session())  # can be in conftest.py
-cli_fixtures = sagetest.init_cli()  # required when using the cli fixture
+cli = sagetest.init_cli()  # required when using the cli fixture
 
-# the cli_fixtures fixture contains jobs matched by --sagetest-fixtures option
+# the cli_fixtures fixture contains jobs matched by --sagetest-filters option
 def test_my_param(cli_fixtures):
     jobs = cli_fixtures["my_jobs"]
 

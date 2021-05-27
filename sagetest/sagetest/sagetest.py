@@ -23,31 +23,31 @@ from .search import Filter, query
 
 
 class SageTest:
-    def __init__(self, session=boto3.Session()) -> None:
+    def __init__(self, session: boto3.Session) -> None:
         self.session = session
 
     def init_fixture(self, name="sagetest_instance"):
-        def func():
+        def return_self():
             yield self
 
         return pytest.fixture(
             scope="session",
             autouse=True,
             name=name,
-            fixture_function=func,
+            fixture_function=return_self,
         )
 
     def init_cli(self, name="cli_fixtures"):
         """Setup fixture from CLI arguments."""
 
         def fixture(pytestconfig, request) -> Dict[str, Jobs]:
-            """Query SageMaker using args passed from --sagetest-fixtures."""
+            """Query SageMaker using args passed from --sagetest-filters."""
 
             try:
                 yield request.getfixturevalue(name)  # reuse if fixture exists
             except FixtureLookupError:
                 filters = json.loads(
-                    pytestconfig.getoption("--sagetest-fixtures")
+                    pytestconfig.getoption("--sagetest-filters")
                 )
                 yield {
                     fixture_name: self.search(Filter(**filterkwargs))
@@ -67,7 +67,7 @@ class SageTest:
         """Query sagemaker with each filter."""
         if isinstance(filters, Filter):
             return query(filters, self.session)
-        return [query(_filter, self.session) for _filter in filters]
+        return [query(filter_, self.session) for filter_ in filters]
 
     def fixture(self, *args, **kwargs) -> Callable:
         """Create a pytest fixture where filters are transformed to `sagetest.Jobs`."""

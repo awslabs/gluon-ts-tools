@@ -49,15 +49,15 @@ def jobs():
     yield Jobs([JOB_1, JOB_2])
 
 
-def test_job_from_json():
-    assert Job.from_json(JOB_JSON_1) == JOB_1
-    assert Job.from_json(JOB_JSON_2) == JOB_2
+def test_job_from_job_description():
+    assert Job.from_job_description(JOB_JSON_1) == JOB_1
+    assert Job.from_job_description(JOB_JSON_2) == JOB_2
 
 
 def test_jobs(jobs):
     assert jobs[0] == JOB_1
     assert jobs[1] == JOB_2
-    assert jobs == Jobs.from_json_list([JOB_JSON_1, JOB_JSON_2])
+    assert jobs == Jobs.from_job_descriptions([JOB_JSON_1, JOB_JSON_2])
     assert jobs == Jobs([JOB_1, JOB_2])
 
 

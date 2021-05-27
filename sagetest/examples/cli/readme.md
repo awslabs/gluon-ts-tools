@@ -1,8 +1,8 @@
 # Using SageTest via the pytest cli
-One can populate fixtures in pytest with SageMaker training jobs by using the `--sagetest-fixtures` option when running pytest.
+One can populate fixtures in pytest with SageMaker training jobs by using the `--sagetest-filters` option when running pytest.
 
 ```bash
-pytest <path> --sagetest-fixtures <filters>
+pytest <path> --sagetest-filters <filters>
 ```
 
 The `<filters>` argument is a dictionary mapping a name to `sagetest.Filters` kwargs. I.e. valid `<filters>` have the following structure:
@@ -17,7 +17,7 @@ Training jobs that match the supplied filters are then accessible via the `cli_f
 Running the below command makes jobs with the name `job-name` available for tests.
 
 ```bash
-pytest test_cli_example.py --sagetest-fixtures '{"my_jobs": {"names": ["job-name"]}}'
+pytest test_cli_example.py --sagetest-filters '{"my_jobs": {"names": ["job-name"]}}'
 ```
 
 In the python file where your tests are defined, you can then request the `cli_fixtures` fixture which contains the matched training jobs under the key you supplied. In this case the key is `my_jobs`.

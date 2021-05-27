@@ -16,18 +16,18 @@
 
 def pytest_addoption(parser):
     """
-    Add --sagetest-fixtures as option to pytest cli.
+    Add --sagetest-filters as option to pytest cli.
 
-    By passing filters to pytest via the `--sagetest-fixtures` option the
+    By passing filters to pytest via the `--sagetest-filters` option the
     matched training jobs will be accessible via the `cli_fixtures` fixture
-    when testing. The arguments to `--sagetest-fixtures` should have the
+    when testing. The arguments to `--sagetest-filters` should have the
     following structure
 
     {<fixture_name>: <kwargs for `sagetest.Filter`>}
 
     Example:
 
-    pytest --sagetest-fixtures {"foo": {"names": ["job-name"]}}
+    pytest --sagetest-filters {"foo": {"names": ["job-name"]}}
 
     Initializing pytest as above makes the `foo` fixture available in pytest
     as part of the `cli_fixtures` fixture. Example:
@@ -39,7 +39,7 @@ def pytest_addoption(parser):
     """
 
     parser.addoption(
-        "--sagetest-fixtures",
+        "--sagetest-filters",
         action="store",
         default="{}",
         help="""Dictionary which will be added to the `cli_fixtures` fixture when tests are run. 

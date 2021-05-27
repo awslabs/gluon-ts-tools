@@ -14,7 +14,7 @@
 """
 This test file should be tested via the below command to make the cli fixture testable.
 
-pytest test_builtin_fixtures.py --sagetest-fixtures='{"test_fixture": {"names": ["test-name"]}}'
+pytest test_builtin_fixtures.py --sagetest-filters='{"test_fixture": {"names": ["test-name"]}}'
 """
 
 from unittest.mock import MagicMock
@@ -25,7 +25,7 @@ from sagetest.search import Filter
 
 sagetest = SageTest(None)  # None due to mocking
 sagetest.search = MagicMock()
-sagetest.search.return_value = Jobs()
+sagetest.search.return_value = Jobs([])
 sagetest_fixture = sagetest.init_fixture()
 sagetest_cli_fixture = sagetest.init_cli()
 
