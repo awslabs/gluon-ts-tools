@@ -16,7 +16,7 @@ import re
 import boto3
 import click
 
-from smily import Arn, Resource, env
+import smily
 
 
 class ArnParamType(click.ParamType):
@@ -24,7 +24,7 @@ class ArnParamType(click.ParamType):
 
     def convert(self, value, param, ctx):
         try:
-            return Arn.parse(value)
+            return smily.Arn.parse(value)
 
         except AssertionError:
             self.fail(f"{value!r} is not a valid arn", param, ctx)
@@ -38,13 +38,15 @@ class ResourceParamType(click.ParamType):
 
     def convert(self, value, param, ctx):
         try:
-            arn = Arn.parse(value)
+            arn = smily.Arn.parse(value)
 
-            profile = env.aws_config.accounts.get(arn.account)
+            profile = smily.env.aws_config.accounts.get(arn.account)
 
-            env._push(boto_session=boto3.Session(profile_name=profile))
+            smily.env._push(
+                boto_session=boto3.Session(profile_name=profile, region_name=arn.region)
+            )
 
-            return Resource.from_arn(arn)
+            return smily.Resource.from_arn(arn)
 
         except AssertionError:
             self.fail(f"{value!r} is not a valid arn", param, ctx)

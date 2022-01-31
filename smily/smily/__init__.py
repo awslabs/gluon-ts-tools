@@ -21,6 +21,7 @@ __all__ = [
     "ProcessingJob",
     "TransformJob",
     "HyperParameterTuningJob",
+    "arn",
 ]
 
 from ._env import env
@@ -35,3 +36,6 @@ from .lib import (
     TransformJob,
     HyperParameterTuningJob,
 )
+
+
+from ._smile import arn

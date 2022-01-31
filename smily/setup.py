@@ -16,6 +16,7 @@ from setuptools import setup, find_packages
 setup(
     name="smily",
     author="Amazon",
+    version="0.0.1",
     author_email="gluon-ts-dev@amazon.com",
     maintainer_email="gluon-ts-dev@amazon.com",
     packages=find_packages("."),
