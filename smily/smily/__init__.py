@@ -22,6 +22,7 @@ __all__ = [
     "TransformJob",
     "HyperParameterTuningJob",
     "arn",
+    "Session",
 ]
 
 from ._env import env
@@ -38,4 +39,5 @@ from .lib import (
 )
 
 
+from .session import Session
 from ._smile import arn

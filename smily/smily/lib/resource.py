@@ -52,9 +52,7 @@ class Resource:
 
         ty = cls.class_for_arn(arn)
 
-        return ty.from_name(
-            arn.resource_id, sagemaker=sagemaker, cw_logs=cw_logs
-        )
+        return ty.from_name(arn.resource_id, sagemaker=sagemaker, cw_logs=cw_logs)
 
     @classmethod
     def kind(cls):
@@ -65,6 +63,11 @@ class Resource:
     def arn_resource_name(cls):
         # E.g. `training-job` for `class TrainingJob`
         return snake_case(cls.kind(), "-")
+
+    @classmethod
+    def arn_field(cls):
+        # E.g. `TrainingJobArn` for `class TrainingJob`
+        return f"{cls.kind()}Arn"
 
     @classmethod
     def name_field(cls):
@@ -104,6 +107,10 @@ class Resource:
         self._sagemaker = sagemaker
         self._cw_logs = cw_logs
         self._log_streams = None
+
+    @property
+    def arn(self):
+        return self._description[self.arn_field()]
 
     @property
     def name(self):
@@ -216,9 +223,7 @@ class TrainingJob(Resource):
 
     def postprocess_description(self, description):
         description["InputDataConfig"] = {
-            channel["ChannelName"]: channel["DataSource"]["S3DataSource"][
-                "S3Uri"
-            ]
+            channel["ChannelName"]: channel["DataSource"]["S3DataSource"]["S3Uri"]
             for channel in description["InputDataConfig"]
         }
 
@@ -226,9 +231,9 @@ class TrainingJob(Resource):
             description["ModelArtifacts"] = description["ModelArtifacts"][
                 "S3ModelArtifacts"
             ]
-        description["TrainingImage"] = description.pop(
-            "AlgorithmSpecification"
-        )["TrainingImage"]
+        description["TrainingImage"] = description.pop("AlgorithmSpecification")[
+            "TrainingImage"
+        ]
 
         if "FinalMetricDataList" in description:
             description["FinalMetricDataList"] = {
