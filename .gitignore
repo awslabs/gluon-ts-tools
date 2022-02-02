@@ -35,7 +35,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 pip-wheel-metadata/
@@ -166,4 +166,3 @@ src/gluonts/version.py
 
 # makefiles with own credentials
 Makefile.own
-
